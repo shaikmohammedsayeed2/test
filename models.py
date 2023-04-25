@@ -54,6 +54,10 @@ class Lab(Base):
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime)
 
+    ## Relation
+    # _lab_members = relationship("LabMember")
+    _lab_members = relationship("LabMember")
+
     __tablename__ = 'TBL_LAB'
 
 
@@ -65,6 +69,8 @@ class LabMember(Base):
     role_id = Column(Integer, ForeignKey("TBL_ROLE.id"))
     person_role_id = Column(Integer, ForeignKey("TBL_PERSON_ROLE.id"))
 
+    ## Relationship
+    _person = relationship("Person")
     __tablename__ = 'TBL_LAB_MEMBER'
 
 
@@ -81,7 +87,6 @@ class Person(Base):
     profile_binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
 
-    labs = relationship("LabMember")
 
     __tablename__ = 'TBL_PERSON'
 
