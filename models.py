@@ -53,10 +53,21 @@ class Lab(Base):
     is_active = Column(Boolean)
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime)
+    twitter_handle = Column(String)
 
     ## Relation
     # _lab_members = relationship("LabMember")
     _lab_members = relationship("LabMember")
+    
+
+    # _patents = relationship("Patents")
+    # _conference = relationship("Conference")
+    # _posterDemo = relationship("PosterDemo")
+    # _publications = relationship("Publication")
+
+
+    _contact_us = relationship("ContactUs") 
+    _events = relationship("Events")
 
     __tablename__ = 'TBL_LAB'
 
@@ -174,3 +185,11 @@ class PosterDemo(Base):
     type = Column(String)
 
     __tablename__ = 'TBL_POSTER_DEMO'
+
+class Gallery(Base):
+    id = Column(Integer,primary_key=True, index=True )
+
+    event_id = Column(Integer, ForeignKey("TBL_EVENTS.id"))
+    binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
+
+    __tablename__ = 'TBL_GALLERY'
