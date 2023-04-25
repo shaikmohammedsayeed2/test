@@ -1,4 +1,4 @@
-/*Returns the */
+/*Returns the details of the lab members given lab id as argument*/
 SELECT name,roll_number,linkedin_url,github_url,personal_web_url,blob_storage as profile_url 
 FROM 
 	(
