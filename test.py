@@ -29,7 +29,7 @@ async def read_users(db: Session = Depends(get_db)):
 ## Function to get the members of the given lab
 @app.get("/people/{lab_id}")
 async def get_people(lab_id:int, db: Session = Depends(get_db)):
-    sql = text(Path("sql/demo.sql").read_text().format(lab_id))
+    sql = text(Path("sql/people.sql").read_text().format(lab_id))
     results = db.execute(sql)
     return results.mappings().all()
 
