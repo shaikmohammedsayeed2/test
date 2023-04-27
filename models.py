@@ -8,7 +8,7 @@ class Binary(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     blob_storage = Column(String)
-    #blob_size = Column(Integer)
+    # blob_size = Column(Integer)
     is_active = Column(Boolean)
     #created_by = Column(Integer, ForeignKey("TBL_PERSON.id")) 
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
