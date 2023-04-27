@@ -82,6 +82,30 @@ async def get_home_details(lab_id:int, db: Session = Depends(get_db)):
     
     return response
 
+
+
+@app.get("/publications/{lab_id}")
+async def get_publications(lab_id:int, db: Session = Depends(get_db)):
+    sql = text(Path("sql/publications.sql").read_text().format(lab_id))
+    results = db.execute(sql)
+    return results.mappings().all()
+
+@app.get("/research/conferences/{lab_id}")
+async def get_publications(lab_id:int, db: Session = Depends(get_db)):
+    sql = text(Path("sql/conference.sql").read_text().format(lab_id))
+    results = db.execute(sql)
+    return results.mappings().all()
+
+
+############################################################################################
+
+###                              POST REQUESTS                                          ###
+
+############################################################################################
+
+
+
+
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile = File(...)):
     blob_service_client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
@@ -93,3 +117,8 @@ async def create_upload_file(file: UploadFile = File(...)):
         "url":blob_client.url,
         "filename": file.filename
         }
+
+
+
+
+
