@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
-
+import datetime
 from database import Base
 
 
@@ -11,7 +11,7 @@ class Binary(Base):
     blob_size = Column(Integer)
     is_active = Column(Boolean)
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id")) 
-    created_at = Column(DateTime)
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_BINARY'
 
@@ -25,7 +25,7 @@ class Conference(Base):
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
     is_active = Column(Boolean)
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
-    created_at = Column(DateTime)
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_CONFERENCE'
 
@@ -38,7 +38,7 @@ class ContactUs(Base):
     phone = Column(String)
     is_active = Column(Boolean)
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
-    created_at = Column(DateTime)
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_CONTACT_US'
 
@@ -52,7 +52,7 @@ class Lab(Base):
     contact_id = Column(Integer, ForeignKey("TBL_CONTACT_US.id"))
     is_active = Column(Boolean)
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
-    created_at = Column(DateTime)
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
     twitter_handle = Column(String)
 
     ## Relation
@@ -94,7 +94,7 @@ class Person(Base):
     github_url = Column(String)
     personal_web_url = Column(String)
     is_active = Column(Boolean)
-    created_at = Column(DateTime)
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
     profile_binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
 
@@ -119,7 +119,7 @@ class Publication(Base):
     pub_binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
-    created_at = Column(DateTime)
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
     type = Column(String)
 
     __tablename__ = 'TBL_PUBLICATION'
@@ -141,7 +141,7 @@ class Slider(Base):
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
     is_active = Column(Boolean)
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
-    created_at = Column(DateTime)
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_SLIDER'
 
@@ -153,7 +153,7 @@ class Events(Base):
     title = Column(String)
     description = Column(String)
     binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
-    created_at = Column(DateTime) 
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     is_active = Column(Boolean)
 
@@ -166,7 +166,7 @@ class Patent(Base):
     publication_id = Column(Integer, ForeignKey("TBL_PUBLICATION.id"))
     description = Column(String)
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
-    created_at = Column(DateTime) 
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     is_active = Column(Boolean)
 
@@ -179,7 +179,7 @@ class PosterDemo(Base):
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
     binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     description = Column(String)
-    created_at = Column(DateTime) 
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     is_active = Column(Boolean)
     type = Column(String)

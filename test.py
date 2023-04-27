@@ -121,4 +121,63 @@ async def create_upload_file(file: UploadFile = File(...)):
 
 
 
+#################################################
+
+async def insert_into_binary_table(db:Session, url:str):
+    bin_entry = models.Binary(
+        blob_storage = url,
+        is_active = True,
+        blob_size = -1,
+        created_by = 1      ##TODO: Insert logeed in perosn id
+    )
+    db.add(bin_entry)
+    db.commit()
+    db.refresh(bin_entry)
+
+    return bin_entry.id
+    
+
+## New lab creation
+async def create_lab(lab: schemas.LabAdd ,db: Session):
+    ## Insert into Binary table 
+    lab_logo_bin_id = await insert_into_binary_table(db,lab.lab_logo_url)
+
+    ## Contact Us table entry
+    contact_entry = models.ContactUs(
+        address = lab.address,
+        email = lab.email,
+        phone = lab.phone,
+        is_active = True,
+        created_by = 1##TODO: Insert logeed in perosn id
+    )
+
+    db.add(contact_entry)
+    db.commit()
+    db.refresh(contact_entry)
+
+    ## Lab Table entry
+    lab_entry = models.Lab(
+        name = lab.name,
+        lab_logo_id = lab_logo_bin_id,
+        overview = lab.overview,
+        contact_id = contact_entry.id,
+        twitter_handle = lab.twitter_handle,
+        is_active = True,
+        created_by = 1##TODO: Insert logeed in perosn id
+    )
+
+    db.add(lab_entry)
+    db.commit()
+    db.refresh(lab_entry)
+
+    return lab_entry.id
+
+
+    
+
+
+@app.post("/lab")
+async def add_lab(lab: schemas.LabAdd ,db: Session = Depends(get_db)):
+    return await create_lab(lab,db)
+
 

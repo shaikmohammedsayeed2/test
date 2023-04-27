@@ -2,13 +2,13 @@ This is the file for adding back end protocols for swe project where we are buil
 
 ## Setup 
 
-``` pip install "fastapi[all]" sqlalchemy ```
+``` pip install "fastapi[all]" sqlalchemyazure-storage-blob ``` 
 
 ## Run
 ``` uvicorn test:app --reload ```
 
 ## Test
-Demo endpoint: ```GET {HOST_URL}/labs```
+Swagger UI: ```GET {HOST_URL}/docs```
 
 
 

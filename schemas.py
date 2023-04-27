@@ -7,3 +7,13 @@ class Lab(BaseModel):
 
     class Config:
         orm_mode = True
+
+class LabAdd(BaseModel):
+    name: str
+    overview: str
+    address: str
+    email: str
+    phone: str
+    twitter_handle:str
+    # Binaries
+    lab_logo_url :str
