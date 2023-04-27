@@ -29,6 +29,23 @@ def get_db():
     finally:
         db.close()
 
+###############################################
+# from enum import Enum
+
+# class USER_ROLE(Enum):
+#     admin = 1
+#     user = 2
+#     manager = 3
+
+# class PERSON_ROLE(Enum):
+#     student = 1
+#     faculty = 2
+#     staff = 3
+
+PERSON_ROLE = {"student" : 1,"faculty" : 2,"staff" : 3}
+USER_ROLE = {"admin":1,"user":2,"manager":3}
+
+###############################################
 
 @app.get("/labs", response_model=list[schemas.Lab])
 async def read_users(db: Session = Depends(get_db)):
@@ -269,6 +286,13 @@ async def add_contactus(contact: schemas.ContactUsAdd ,db: Session = Depends(get
 
 async def create_person(person: schemas.PersonAdd ,db: Session):
 
+    # Checks 
+    try:
+        assert person.person_role.lower() in PERSON_ROLE.keys() 
+        assert person.user_role.lower() in USER_ROLE.keys() 
+    except AssertionError:
+        raise HTTPException(status_code=400, detail="Person role argument invalid")
+
     person_bin_id = await insert_into_binary_table(db,person.person_image)
 
     ## Person Table entry
@@ -286,6 +310,21 @@ async def create_person(person: schemas.PersonAdd ,db: Session):
     db.add(person_entry)
     db.commit()
     db.refresh(person_entry)
+
+    
+
+    ## Lab Member table entry
+    lab_mem_entry = models.LabMember(
+        person_id = person_entry.id,
+        lab_id= person.lab_id,
+        role_id = USER_ROLE[person.user_role],
+        person_role_id = PERSON_ROLE[person.person_role]
+
+    )
+
+    db.add(lab_mem_entry)
+    db.commit()
+    db.refresh(lab_mem_entry)
 
     return person_entry.id
 
@@ -431,3 +470,6 @@ async def create_gallery_image(gallery: schemas.GalleryImageAdd ,db: Session):
 @app.post("/galleryimage")
 async def add_gallery_image(gallery: schemas.GalleryImageAdd ,db: Session = Depends(get_db)):
     return await create_gallery_image(gallery,db)
+
+
+#####################################################

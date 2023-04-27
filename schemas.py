@@ -44,6 +44,10 @@ class PersonAdd(BaseModel):
     linkedin_url: str
     github_url: str
     personal_web_url: str
+    # Role
+    lab_id: str
+    person_role: str
+    user_role: str
     # Binaries
     person_image: str
 
