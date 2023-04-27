@@ -180,4 +180,254 @@ async def create_lab(lab: schemas.LabAdd ,db: Session):
 async def add_lab(lab: schemas.LabAdd ,db: Session = Depends(get_db)):
     return await create_lab(lab,db)
 
+############################################################################
 
+## New Publication Creation
+
+async def create_publication(pub: schemas.PublicationAdd ,db: Session):
+    ## Insert into Binary table 
+    publication_bin_id = await insert_into_binary_table(db,pub.pub_pdf)
+
+    ## Publication Table entry
+    publication_entry = models.Publication(
+        pub_title = pub.pub_title,
+        pub_binary_id = publication_bin_id,
+        description = pub.description,
+        lab_id = pub.lab_id,
+        type = pub.type,
+        created_by = 1##TODO: Insert logeed in perosn id
+    )
+
+    db.add(publication_entry)
+    db.commit()
+    db.refresh(publication_entry)
+
+    return publication_entry.id
+
+
+@app.post("/publication")
+async def add_publication(pub: schemas.PublicationAdd ,db: Session = Depends(get_db)):
+    return await create_publication(pub,db)
+
+########################################################################################################################
+## New Conference Creation
+
+async def create_conference(conf: schemas.ConferenceAdd ,db: Session):
+    ## Insert into Binary table 
+    conference_bin_id = await insert_into_binary_table(db,conf.conf_pdf)
+
+    ## Publication Table entry
+    conference_entry = models.Conference(
+        conf_title = conf.conf_title,
+        conf_binary_id = conference_bin_id,
+        description = conf.description,
+        lab_id = conf.lab_id,
+        is_active = True,
+        created_by = 1##TODO: Insert logeed in perosn id
+    )
+
+    db.add(conference_entry)
+    db.commit()
+    db.refresh(conference_entry)
+
+    return conference_entry.id
+
+
+@app.post("/conference")
+async def add_conference(conf: schemas.ConferenceAdd ,db: Session = Depends(get_db)):
+    return await create_conference(conf,db)  
+
+##############################################################################################################
+
+## New ContactUs Creation
+
+async def create_contactus(contact: schemas.ContactUsAdd ,db: Session):
+
+    ## ContactUs Table entry
+    contactus_entry = models.ContactUs(
+        address = contact.address,
+        email = contact.email,
+        phone = contact.phone,
+        is_active = True,
+        created_by = 1##TODO: Insert logeed in perosn id
+    )
+
+    db.add(contactus_entry)
+    db.commit()
+    db.refresh(contactus_entry)
+
+    return contactus_entry.id
+
+
+@app.post("/contactus")
+async def add_contactus(contact: schemas.ContactUsAdd ,db: Session = Depends(get_db)):
+    return await create_contactus(contact,db) 
+
+#######################################################################################################################
+
+## New Person Creation
+
+async def create_person(person: schemas.PersonAdd ,db: Session):
+
+    person_bin_id = await insert_into_binary_table(db,person.person_image)
+
+    ## Person Table entry
+    person_entry = models.Person(
+        name = person.name,
+        roll_number = person.roll_number,
+        linkedin_url = person.linkedin_url,
+        github_url = person.github_url,
+        personal_web_url = person.personal_web_url,
+        profile_binary_id = person_bin_id,
+        is_active = True,
+        created_by = 1##TODO: Insert logeed in perosn id
+    )
+
+    db.add(person_entry)
+    db.commit()
+    db.refresh(person_entry)
+
+    return person_entry.id
+
+
+@app.post("/person")
+async def add_person(person: schemas.PersonAdd ,db: Session = Depends(get_db)):
+    return await create_person(person,db) 
+
+#######################################################################################################
+
+## New Patent Creation
+
+async def create_patent(patent: schemas.PatentAdd ,db: Session):
+
+    ## Patent Table entry
+    patent_entry = models.Patent(
+        publication_id = patent.publication_id,
+        description = patent.description,
+        lab_id = patent.lab_id,
+        is_active = True,
+        created_by = 1##TODO: Insert logeed in perosn id
+    )
+
+    db.add(patent_entry)
+    db.commit()
+    db.refresh(patent_entry)
+
+    return patent_entry.id
+
+
+@app.post("/patent")
+async def add_patent(patent: schemas.PatentAdd ,db: Session = Depends(get_db)):
+    return await create_patent(patent,db)
+
+###########################################################################################################
+
+## New Event Creation
+
+async def create_event(event: schemas.EventAdd ,db: Session):
+
+    event_bin_id = await insert_into_binary_table(db,event.event_image)
+
+    ## Event Table entry
+    event_entry = models.Events(
+        lab_id = event.lab_id,
+        title = event.title,
+        description = event.description,
+        binary_id = event_bin_id,
+        is_active = True,
+        created_by = 1##TODO: Insert logeed in perosn id
+    )
+
+    db.add(event_entry)
+    db.commit()
+    db.refresh(event_entry)
+
+    return event_entry.id
+
+
+@app.post("/event")
+async def add_event(event: schemas.EventAdd ,db: Session = Depends(get_db)):
+    return await create_event(event,db)
+
+##################################################################################################################
+
+## New PosterDemo Creation
+
+async def create_poster_demo(posdem: schemas.PosterDemoAdd ,db: Session):
+
+    posdem_bin_id = await insert_into_binary_table(db,posdem.poster_demo_image)
+
+    ## Event Table entry
+    posdem_entry = models.PosterDemo(
+        lab_id = posdem.lab_id,
+        description = posdem.description,
+        binary_id = posdem_bin_id,
+        type = posdem.type,
+        is_active = True,
+        created_by = 1##TODO: Insert logeed in perosn id
+    )
+
+    db.add(posdem_entry)
+    db.commit()
+    db.refresh(posdem_entry)
+
+    return posdem_entry.id
+
+
+@app.post("/posterdemo")
+async def add_poster_demo(posdem: schemas.PosterDemoAdd ,db: Session = Depends(get_db)):
+    return await create_poster_demo(posdem,db)
+ 
+#########################################################################################################################
+
+## New Slider Image Creation
+
+async def create_slider_image(sli: schemas.SliderImageAdd ,db: Session):
+
+    sli_bin_id = await insert_into_binary_table(db,sli.slider_image)
+
+    ## Slider Table entry
+    sli_entry = models.Slider(
+        lab_id = sli.lab_id,
+        slider_binary_id = sli_bin_id,
+        is_active = True,
+        created_by = 1##TODO: Insert logeed in perosn id
+    )
+
+    db.add(sli_entry)
+    db.commit()
+    db.refresh(sli_entry)
+
+    return sli_entry.id
+
+
+@app.post("/sliderimage")
+async def add_slider_image(sli: schemas.SliderImageAdd ,db: Session = Depends(get_db)):
+    return await create_slider_image(sli,db)
+
+###############################################################################################################################
+
+## New Gallery Image Creation
+
+async def create_gallery_image(gallery: schemas.GalleryImageAdd ,db: Session):
+
+    gallery_bin_id = await insert_into_binary_table(db,gallery.gallery_image)
+
+    ## Gallery Table entry
+    gallery_entry = models.Gallery(
+        event_id = gallery.event_id,
+        binary_id = gallery_bin_id,
+        #is_active = True,
+        #created_by = 1##TODO: Insert logeed in perosn id
+    )
+
+    db.add(gallery_entry)
+    db.commit()
+    db.refresh(gallery_entry)
+
+    return gallery_entry.id
+
+
+@app.post("/galleryimage")
+async def add_gallery_image(gallery: schemas.GalleryImageAdd ,db: Session = Depends(get_db)):
+    return await create_gallery_image(gallery,db)
