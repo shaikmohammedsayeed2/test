@@ -517,10 +517,61 @@ async def add_gallery_image(gallery: schemas.GalleryImageAdd ,db: Session = Depe
 
 
 #####################################################
-
+## to delete images from gallery
 @app.delete("/images")
 async def delete_images_by_id(imageids:list[int],db: Session = Depends(get_db)) :
     for imageid in imageids:
         db.delete(db.get(models.Gallery,imageid))
     db.commit()  
     return ""
+####################################################
+## to delete a lab
+@app.delete("/lab")
+async def delete_lab_by_id(lab_id:int,db: Session = Depends(get_db)):
+    db.delete(db.get(models.Lab,lab_id))
+    db.commit()
+    return ""
+####################################################
+## to delete a lab
+@app.delete("/conference")
+async def delete_conference_by_id(conf_id:int,db: Session = Depends(get_db)):
+    db.delete(db.get(models.Conference,conf_id))
+    db.commit()
+    return "" 
+######################################################
+## to delete a publication
+@app.delete("/publication")
+async def delete_publication_by_id(publication_id:int,db: Session = Depends(get_db)):
+    db.delete(db.get(models.Publication,publication_id))
+    db.commit()
+    return ""
+########################################################
+## to delete a event
+@app.delete("/event")
+async def delete_event_by_id(event_id:int,db: Session = Depends(get_db)):
+    db.delete(db.get(models.Events,event_id))
+    db.commit()
+    return ""
+########################################################
+## to delete a patent
+@app.delete("/patent")
+async def delete_patent_by_id(patent_id:int,db: Session = Depends(get_db)):
+    db.delete(db.get(models.Patent,patent_id))
+    db.commit()
+    return ""
+########################################################
+## to delete a PosterDemo
+@app.delete("/posterdemo")
+async def delete_posterdemo_by_id(posdem_id:int,db: Session = Depends(get_db)):
+    db.delete(db.get(models.PosterDemo,posdem_id))
+    db.commit()
+    return "" 
+########################################################
+## to delete a slider image
+@app.delete("/slider")
+async def delete_slider_image_by_id(slider_id:int,db: Session = Depends(get_db)):
+    db.delete(db.get(models.Slider,slider_id))
+    db.commit()
+    return ""
+#######################################################
+#            
