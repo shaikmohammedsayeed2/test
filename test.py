@@ -1,15 +1,26 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 import models, schemas
-
+from fastapi.middleware.cors import CORSMiddleware
+from azure.storage.blob import BlobServiceClient, BlobClient
+from azure.storage.blob import ContentSettings, ContainerClient
 from sqlalchemy import select,text
- 
-
 from pathlib import Path
- 
+
+STORAGE_ACCOUNT_KEY = "sas9P21AXygSyNPuDf7ckmuX4bctEVeKy78IpCfLdGcfh9ROBv2stQ+SGAfL8PffOGGUtZW3VPnI+AStRY3dYg=="
+STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=rlestoragefree;AccountKey=sas9P21AXygSyNPuDf7ckmuX4bctEVeKy78IpCfLdGcfh9ROBv2stQ+SGAfL8PffOGGUtZW3VPnI+AStRY3dYg==;EndpointSuffix=core.windows.net"
+IMAGE_CONTAINER = "rleassests"
+
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -29,7 +40,7 @@ async def read_users(db: Session = Depends(get_db)):
 ## Function to get the members of the given lab
 @app.get("/people/{lab_id}")
 async def get_people(lab_id:int, db: Session = Depends(get_db)):
-    sql = text(Path("sql/demo.sql").read_text().format(lab_id))
+    sql = text(Path("sql/people.sql").read_text().format(lab_id))
     results = db.execute(sql)
     return results.mappings().all()
 
@@ -70,3 +81,15 @@ async def get_home_details(lab_id:int, db: Session = Depends(get_db)):
     response['slider'] = slider
     
     return response
+
+@app.post("/uploadfile/")
+async def create_upload_file(file: UploadFile = File(...)):
+    blob_service_client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
+    container_client = blob_service_client.get_container_client(IMAGE_CONTAINER)
+    blob_client = container_client.get_blob_client(file.filename)
+    data = await file.read()
+    blob_client.upload_blob(data)
+    return {
+        "url":blob_client.url,
+        "filename": file.filename
+        }

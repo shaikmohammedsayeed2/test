@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'rlebe'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4930F59863B84C1A9D03F6A65F1E7B20 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5BDE194DFA554B9E9D02A8EE33A4AFE1 }}
