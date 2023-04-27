@@ -280,7 +280,7 @@ async def create_conference(conf: schemas.ConferenceAdd ,db: Session):
         end_date = conf.end_date,
 
         lab_id = conf.lab_id,
-        is_active = conf.is_active,
+        is_active = True,
         #created_by = 1##TODO: Insert logeed in perosn id
     )
 
