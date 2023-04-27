@@ -80,3 +80,10 @@ class GalleryImageAdd(BaseModel):
     event_id: int
     # Binaries
     gallery_image: str
+
+
+class FeedbackAdd(BaseModel):
+    name:str
+    email:str
+    subject: str
+    message: str

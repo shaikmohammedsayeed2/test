@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Date
 from sqlalchemy.orm import relationship
 import datetime
 from database import Base
@@ -154,6 +154,7 @@ class Events(Base):
     title = Column(String)
     description = Column(String)
     binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
+    event_date = Column(Date)
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     is_active = Column(Boolean)
@@ -194,3 +195,16 @@ class Gallery(Base):
     binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
 
     __tablename__ = 'TBL_GALLERY'
+
+
+class Feedback(Base):
+    id = Column(Integer,primary_key=True, index=True )
+    name = Column(String)
+    email = Column(String)
+    subject = Column(String)
+    message = Column(String)
+
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
+
+
+    __tablename__ = 'TBL_FEEDBACK'

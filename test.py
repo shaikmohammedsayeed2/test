@@ -73,7 +73,7 @@ async def get_gallery(lab_id:int, db: Session = Depends(get_db)):
     results = db.execute(sql)
     return results.mappings().all()
 
-# @app.get("/research/{lab_id}")
+#############################################################
 async def get_resarch_metrics(lab_id:int, db: Session):
     # Conference table contains other conference (Local, etc..)
     # Publication table contains internaational Confernces and Journals
@@ -85,6 +85,10 @@ async def get_resarch_metrics(lab_id:int, db: Session):
         "journalCount":     db.query(models.Publication).filter(models.Publication.type == "journal",models.Publication.lab_id == lab_id).count()
             }
 
+async def get_home_events(lab_id:int, db: Session = Depends(get_db)):
+    sql = text(Path("sql/home_events.sql").read_text().format(lab_id))
+    results = db.execute(sql)
+    return results.mappings().all()
 
 @app.get("/home/{lab_id}")
 async def get_home_details(lab_id:int, db: Session = Depends(get_db)):
@@ -92,13 +96,13 @@ async def get_home_details(lab_id:int, db: Session = Depends(get_db)):
     assert type(lab)==models.Lab
     response = dict()
     # Event details
-    response["Name"] = lab.name
+    response["name"] = lab.name
     response["logo"] = db.get(models.Binary, lab.lab_logo_id).blob_storage
     response["cover_url"] = db.get(models.Binary, lab.cover_binary_id)
     response['contact_us'] =  lab._contact_us
     response['twitter_handle'] = lab.twitter_handle
-    response['Overview'] = lab.overview
-    response['events'] = lab._events
+    response['overview'] = lab.overview
+    response['events'] = await get_home_events(lab_id, db)
     # Slider handle
     slider = db.execute(text(Path("sql/slider.sql").read_text().format(lab_id))).mappings().all()
     response['slider'] = slider
@@ -107,6 +111,7 @@ async def get_home_details(lab_id:int, db: Session = Depends(get_db)):
     return response
 
 
+#############################################################
 
 @app.get("/publications/{lab_id}")
 async def get_publications(lab_id:int, db: Session = Depends(get_db)):
@@ -141,6 +146,22 @@ async def create_upload_file(file: UploadFile = File(...)):
         "url":blob_client.url,
         "filename": file.filename
         }
+
+
+@app.post("/feedback")
+async def submit_feedback(feedback: schemas.FeedbackAdd ,db: Session = Depends(get_db)):
+    feedback_entry = models.Feedback(
+        name = feedback.name,
+        email = feedback.email,
+        subject = feedback.subject,
+        message = feedback.message
+    )
+
+    db.add(feedback_entry)
+    db.commit()
+    db.refresh(feedback_entry)
+
+    return feedback_entry.id
 
 
 
