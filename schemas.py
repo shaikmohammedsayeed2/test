@@ -45,7 +45,7 @@ class PersonAdd(BaseModel):
     github_url: str
     personal_web_url: str
     # Role
-    lab_id: str
+    lab_id: int
     person_role: str
     user_role: str
     # Binaries

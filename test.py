@@ -7,6 +7,7 @@ from azure.storage.blob import BlobServiceClient, BlobClient
 from azure.storage.blob import ContentSettings, ContainerClient
 from sqlalchemy import select,text
 from pathlib import Path
+from fastapi.responses import RedirectResponse
 
 STORAGE_ACCOUNT_KEY = "sas9P21AXygSyNPuDf7ckmuX4bctEVeKy78IpCfLdGcfh9ROBv2stQ+SGAfL8PffOGGUtZW3VPnI+AStRY3dYg=="
 STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=rlestoragefree;AccountKey=sas9P21AXygSyNPuDf7ckmuX4bctEVeKy78IpCfLdGcfh9ROBv2stQ+SGAfL8PffOGGUtZW3VPnI+AStRY3dYg==;EndpointSuffix=core.windows.net"
@@ -46,6 +47,10 @@ PERSON_ROLE = {"student" : 1,"faculty" : 2,"staff" : 3}
 USER_ROLE = {"admin":1,"user":2,"manager":3}
 
 ###############################################
+
+@app.get("/")
+def redirect():
+    return RedirectResponse("/docs")
 
 @app.get("/labs", response_model=list[schemas.Lab])
 async def read_users(db: Session = Depends(get_db)):
@@ -291,7 +296,9 @@ async def create_person(person: schemas.PersonAdd ,db: Session):
         assert person.person_role.lower() in PERSON_ROLE.keys() 
         assert person.user_role.lower() in USER_ROLE.keys() 
     except AssertionError:
-        raise HTTPException(status_code=400, detail="Person role argument invalid")
+        raise HTTPException(status_code=422, detail="Person role argument invalid")
+    
+    
 
     person_bin_id = await insert_into_binary_table(db,person.person_image)
 
