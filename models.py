@@ -10,7 +10,7 @@ class Binary(Base):
     blob_storage = Column(String)
     blob_size = Column(Integer)
     is_active = Column(Boolean)
-    created_by = Column(Integer, ForeignKey("TBL_PERSON.id")) 
+    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id")) 
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_BINARY'
@@ -28,7 +28,7 @@ class Conference(Base):
     end_date = Column(Date)
 
     is_active = Column(Boolean)
-    created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_CONFERENCE'
@@ -41,7 +41,7 @@ class ContactUs(Base):
     email = Column(String)
     phone = Column(String)
     is_active = Column(Boolean)
-    created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_CONTACT_US'
@@ -56,7 +56,7 @@ class Lab(Base):
     overview = Column(String)
     contact_id = Column(Integer, ForeignKey("TBL_CONTACT_US.id"))
     is_active = Column(Boolean)
-    created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
     twitter_handle = Column(String)
 
@@ -101,7 +101,7 @@ class Person(Base):
     is_active = Column(Boolean)
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
     profile_binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
-    created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
 
 
     __tablename__ = 'TBL_PERSON'
@@ -126,7 +126,7 @@ class Publication(Base):
 
     pub_date = Column(Date)
 
-    created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
     type = Column(String)
 
@@ -148,7 +148,7 @@ class Slider(Base):
     slider_binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
     is_active = Column(Boolean)
-    created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_SLIDER'
@@ -163,7 +163,7 @@ class Events(Base):
     binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     event_date = Column(Date)
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
-    created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     is_active = Column(Boolean)
 
     __tablename__ = 'TBL_EVENTS'
@@ -176,7 +176,7 @@ class Patent(Base):
     description = Column(String)
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
-    created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     is_active = Column(Boolean)
 
     __tablename__ = 'TBL_PATENT'
@@ -189,7 +189,7 @@ class PosterDemo(Base):
     binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     description = Column(String)
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
-    created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     is_active = Column(Boolean)
     type = Column(String)
 

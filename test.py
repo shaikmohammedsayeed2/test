@@ -179,7 +179,7 @@ async def insert_into_binary_table(db:Session, url:str):
         blob_storage = url,
         is_active = True,
         blob_size = -1,
-        created_by = 1      ##TODO: Insert logeed in perosn id
+        #created_by = 1      ##TODO: Insert logeed in perosn id
     )
     db.add(bin_entry)
     db.commit()
@@ -200,7 +200,7 @@ async def create_lab(lab: schemas.LabAdd ,db: Session):
         email = lab.email,
         phone = lab.phone,
         is_active = True,
-        created_by = 1##TODO: Insert logeed in perosn id
+        #created_by = 1##TODO: Insert logeed in perosn id
     )
 
     db.add(contact_entry)
@@ -216,7 +216,7 @@ async def create_lab(lab: schemas.LabAdd ,db: Session):
         contact_id = contact_entry.id,
         twitter_handle = lab.twitter_handle,
         is_active = True,
-        created_by = 1##TODO: Insert logeed in perosn id
+        #created_by = 1##TODO: Insert logeed in perosn id
     )
 
     db.add(lab_entry)
@@ -249,7 +249,7 @@ async def create_publication(pub: schemas.PublicationAdd ,db: Session):
         description = pub.description,
         lab_id = pub.lab_id,
         type = pub.type,
-        created_by = 1##TODO: Insert logeed in perosn id
+        #created_by = 1##TODO: Insert logeed in perosn id
     )
 
     db.add(publication_entry)
@@ -281,7 +281,7 @@ async def create_conference(conf: schemas.ConferenceAdd ,db: Session):
 
         lab_id = conf.lab_id,
         is_active = conf.is_active,
-        created_by = 1##TODO: Insert logeed in perosn id
+        #created_by = 1##TODO: Insert logeed in perosn id
     )
 
     db.add(conference_entry)
@@ -307,7 +307,7 @@ async def create_contactus(contact: schemas.ContactUsAdd ,db: Session):
         email = contact.email,
         phone = contact.phone,
         is_active = True,
-        created_by = 1##TODO: Insert logeed in perosn id
+        #created_by = 1##TODO: Insert logeed in perosn id
     )
 
     db.add(contactus_entry)
@@ -347,7 +347,7 @@ async def create_person(person: schemas.PersonAdd ,db: Session):
         personal_web_url = person.personal_web_url,
         profile_binary_id = person_bin_id,
         is_active = True,
-        created_by = 1##TODO: Insert logeed in perosn id
+        #created_by = 1##TODO: Insert logeed in perosn id
     )
 
     db.add(person_entry)
@@ -388,7 +388,7 @@ async def create_patent(patent: schemas.PatentAdd ,db: Session):
         description = patent.description,
         lab_id = patent.lab_id,
         is_active = True,
-        created_by = 1##TODO: Insert logeed in perosn id
+        #created_by = 1##TODO: Insert logeed in perosn id
     )
 
     db.add(patent_entry)
@@ -418,7 +418,7 @@ async def create_event(event: schemas.EventAdd ,db: Session):
         event_date = event.event_date,
         binary_id = event_bin_id,
         is_active = True,
-        created_by = 1##TODO: Insert logeed in perosn id
+        #created_by = 1##TODO: Insert logeed in perosn id
     )
 
     db.add(event_entry)
@@ -447,7 +447,7 @@ async def create_poster_demo(posdem: schemas.PosterDemoAdd ,db: Session):
         binary_id = posdem_bin_id,
         type = posdem.type,
         is_active = True,
-        created_by = 1##TODO: Insert logeed in perosn id
+        #created_by = 1##TODO: Insert logeed in perosn id
     )
 
     db.add(posdem_entry)
@@ -474,7 +474,7 @@ async def create_slider_image(sli: schemas.SliderImageAdd ,db: Session):
         lab_id = sli.lab_id,
         slider_binary_id = sli_bin_id,
         is_active = True,
-        created_by = 1##TODO: Insert logeed in perosn id
+        #created_by = 1##TODO: Insert logeed in perosn id
     )
 
     db.add(sli_entry)
@@ -528,7 +528,10 @@ async def delete_images_by_id(imageids:list[int],db: Session = Depends(get_db)) 
 ## to delete a lab
 @app.delete("/lab")
 async def delete_lab_by_id(lab_id:int,db: Session = Depends(get_db)):
-    db.delete(db.get(models.Lab,lab_id))
+    lab = db.get(models.Lab,lab_id)
+    contactus = db.get(models.ContactUs,lab.contact_id) 
+    db.delete(lab)
+    db.delete(contactus)
     db.commit()
     return ""
 ####################################################
@@ -574,4 +577,14 @@ async def delete_slider_image_by_id(slider_id:int,db: Session = Depends(get_db))
     db.commit()
     return ""
 #######################################################
-#            
+## to delete a person
+@app.delete("/labmember")
+async def delete_labmember_by_id(labmember_id:int,db: Session = Depends(get_db)):
+    person_id = db.get(models.LabMember,labmember_id).person_id
+    ref_count = db.query(models.Person).filter(models.Person.id==person_id).count()
+    if ref_count == 1:
+        db.delete(db.get(models.Person,person_id))
+    else:
+        db.delete(db.get(models.LabMember,labmember_id))
+    db.commit()
+    return ""            
