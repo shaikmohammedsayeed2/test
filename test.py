@@ -93,7 +93,7 @@ async def get_home_events(lab_id:int, db: Session = Depends(get_db)):
 @app.get("/home/{lab_id}")
 async def get_home_details(lab_id:int, db: Session = Depends(get_db)):
     lab = db.get(models.Lab, lab_id)
-    assert type(lab)==models.Lab
+    # assert type(lab)==models.Lab
     response = dict()
     # Event details
     response["name"] = lab.name
@@ -178,7 +178,7 @@ async def insert_into_binary_table(db:Session, url:str):
     bin_entry = models.Binary(
         blob_storage = url,
         is_active = True,
-        blob_size = -1,
+        # blob_size = -1,
         #created_by = 1      ##TODO: Insert logeed in perosn id
     )
     db.add(bin_entry)
