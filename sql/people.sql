@@ -1,5 +1,5 @@
 /*Returns the details of the lab members given lab id as argument*/
-SELECT name,roll_number,person_role_name as role_name,linkedin_url,github_url,personal_web_url,blob_storage as profile_url 
+SELECT name,roll_number,LM.id,person_role_name as role_name,linkedin_url,github_url,personal_web_url,blob_storage as profile_url 
 FROM 
 	((
 		(public."TBL_LAB_MEMBER" as LM INNER JOIN public."TBL_PERSON" as person ON LM.person_id = person.id) 

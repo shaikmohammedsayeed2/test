@@ -480,3 +480,10 @@ async def add_gallery_image(gallery: schemas.GalleryImageAdd ,db: Session = Depe
 
 
 #####################################################
+
+@app.delete("/images")
+async def delete_images_by_id(imageids:list[int],db: Session = Depends(get_db)) :
+    for imageid in imageids:
+        db.delete(db.get(models.Gallery,imageid))
+    db.commit()  
+    return ""
