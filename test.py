@@ -43,7 +43,7 @@ def get_db():
 #     faculty = 2
 #     staff = 3
 
-PERSON_ROLE = {"student" : 1,"faculty" : 2,"staff" : 3}
+PERSON_ROLE = {"student" : 1,"faculty" : 2,"staff" : 3,"sponsor":4}
 USER_ROLE = {"admin":1,"user":2,"manager":3}
 
 ###############################################
@@ -119,12 +119,18 @@ async def get_publications(lab_id:int, db: Session = Depends(get_db)):
     results = db.execute(sql)
     return results.mappings().all()
 
-@app.get("/research/conferences/{lab_id}")
+@app.get("/conferences/{lab_id}")
 async def get_publications(lab_id:int, db: Session = Depends(get_db)):
     sql = text(Path("sql/conference.sql").read_text().format(lab_id))
     results = db.execute(sql)
     return results.mappings().all()
 
+
+@app.get("/research/{lab_id}")
+async def get_publications(lab_id:int, db: Session = Depends(get_db)):
+    sql = text(Path("sql/conference.sql").read_text().format(lab_id))
+    results = db.execute(sql)
+    return results.mappings().all()
 
 ############################################################################################
 
@@ -239,6 +245,7 @@ async def create_publication(pub: schemas.PublicationAdd ,db: Session):
     publication_entry = models.Publication(
         pub_title = pub.pub_title,
         pub_binary_id = publication_bin_id,
+        pub_date = pub.pub_date,
         description = pub.description,
         lab_id = pub.lab_id,
         type = pub.type,
@@ -268,8 +275,12 @@ async def create_conference(conf: schemas.ConferenceAdd ,db: Session):
         conf_title = conf.conf_title,
         conf_binary_id = conference_bin_id,
         description = conf.description,
+
+        start_date = conf.start_date,
+        end_date = conf.end_date,
+
         lab_id = conf.lab_id,
-        is_active = True,
+        is_active = conf.is_active,
         created_by = 1##TODO: Insert logeed in perosn id
     )
 
@@ -404,6 +415,7 @@ async def create_event(event: schemas.EventAdd ,db: Session):
         lab_id = event.lab_id,
         title = event.title,
         description = event.description,
+        event_date = event.event_date,
         binary_id = event_bin_id,
         is_active = True,
         created_by = 1##TODO: Insert logeed in perosn id
@@ -482,21 +494,21 @@ async def add_slider_image(sli: schemas.SliderImageAdd ,db: Session = Depends(ge
 
 async def create_gallery_image(gallery: schemas.GalleryImageAdd ,db: Session):
 
-    gallery_bin_id = await insert_into_binary_table(db,gallery.gallery_image)
+    for image in gallery.gallery_images_url:
+        gallery_bin_id = await insert_into_binary_table(db,image)
 
-    ## Gallery Table entry
-    gallery_entry = models.Gallery(
-        event_id = gallery.event_id,
-        binary_id = gallery_bin_id,
-        #is_active = True,
-        #created_by = 1##TODO: Insert logeed in perosn id
-    )
+        ## Gallery Table entry
+        gallery_entry = models.Gallery(
+            event_id = gallery.event_id,
+            binary_id = gallery_bin_id,
+            #is_active = True,
+            #created_by = 1##TODO: Insert logeed in perosn id
+        )
 
-    db.add(gallery_entry)
+        db.add(gallery_entry)
+    
     db.commit()
-    db.refresh(gallery_entry)
-
-    return gallery_entry.id
+    return 
 
 
 @app.post("/galleryimage")

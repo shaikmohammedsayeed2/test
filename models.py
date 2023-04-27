@@ -23,6 +23,10 @@ class Conference(Base):
     description = Column(String)
     conf_binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
+
+    start_date = Column(Date)
+    end_date = Column(Date)
+
     is_active = Column(Boolean)
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
@@ -119,6 +123,9 @@ class Publication(Base):
     description = Column(String)
     pub_binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
+
+    pub_date = Column(Date)
+
     created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
     type = Column(String)

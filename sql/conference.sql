@@ -6,11 +6,11 @@ FROM
     )
 		
 WHERE CO.lab_id = {0}
-UNION
-SELECT PB.id,pub_title,description,blob_storage
-FROM
-    (
-        (public."TBL_PUBLICATION" as PB INNER JOIN public."TBL_BINARY" as bin ON bin.id = PB.pub_binary_id) 
-    )
+-- UNION
+-- SELECT PB.id,pub_title,description,blob_storage
+-- FROM
+--     (
+--         (public."TBL_PUBLICATION" as PB INNER JOIN public."TBL_BINARY" as bin ON bin.id = PB.pub_binary_id) 
+--     )
 
-WHERE PB.lab_id = {0} AND (PB.type LIKE '%conference%');
+-- WHERE PB.lab_id = {0} AND (PB.type LIKE '%conference%');

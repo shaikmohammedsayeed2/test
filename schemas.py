@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+import datetime
+
 
 class Lab(BaseModel):
     id :int
@@ -24,6 +26,7 @@ class PublicationAdd(BaseModel):
     description: str
     lab_id: int
     type: str
+    pub_date : datetime.date
     # Binaries
     pub_pdf:str
 
@@ -31,6 +34,8 @@ class ConferenceAdd(BaseModel):
     conf_title: str
     description: str
     lab_id: int
+    start_date : datetime.date
+    end_date   : datetime.date
     # Binaries
     conf_pdf:str
 
@@ -61,6 +66,7 @@ class EventAdd(BaseModel):
     lab_id: int
     title: str
     description: str
+    event_date : datetime.date
     # Binaries
     event_image: str
 
@@ -79,7 +85,7 @@ class SliderImageAdd(BaseModel):
 class GalleryImageAdd(BaseModel):
     event_id: int
     # Binaries
-    gallery_image: str
+    gallery_images_url: list[str]
 
 
 class FeedbackAdd(BaseModel):
