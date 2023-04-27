@@ -48,6 +48,7 @@ class Lab(Base):
 
     name = Column(String)
     lab_logo_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
+    cover_binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     overview = Column(String)
     contact_id = Column(Integer, ForeignKey("TBL_CONTACT_US.id"))
     is_active = Column(Boolean)

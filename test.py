@@ -73,8 +73,8 @@ async def get_gallery(lab_id:int, db: Session = Depends(get_db)):
     results = db.execute(sql)
     return results.mappings().all()
 
-@app.get("/research/{lab_id}")
-async def get_resarch_counts(lab_id:int, db: Session = Depends(get_db)):
+# @app.get("/research/{lab_id}")
+async def get_resarch_metrics(lab_id:int, db: Session):
     # Conference table contains other conference (Local, etc..)
     # Publication table contains internaational Confernces and Journals
     confenceCount = db.query(models.Publication).filter(models.Publication.type == "conference",models.Publication.lab_id == lab_id).count()
@@ -94,14 +94,16 @@ async def get_home_details(lab_id:int, db: Session = Depends(get_db)):
     # Event details
     response["Name"] = lab.name
     response["logo"] = db.get(models.Binary, lab.lab_logo_id).blob_storage
-    response['ContactUs'] =  lab._contact_us
-    response['TwitterHandle'] = lab.twitter_handle
+    response["cover_url"] = db.get(models.Binary, lab.cover_binary_id)
+    response['contact_us'] =  lab._contact_us
+    response['twitter_handle'] = lab.twitter_handle
     response['Overview'] = lab.overview
-    response['Events'] = lab._events
+    response['events'] = lab._events
     # Slider handle
     slider = db.execute(text(Path("sql/slider.sql").read_text().format(lab_id))).mappings().all()
     response['slider'] = slider
-    
+    ## Counts
+    response["metrics"] = await get_resarch_metrics(lab_id,db)
     return response
 
 
@@ -163,6 +165,7 @@ async def insert_into_binary_table(db:Session, url:str):
 async def create_lab(lab: schemas.LabAdd ,db: Session):
     ## Insert into Binary table 
     lab_logo_bin_id = await insert_into_binary_table(db,lab.lab_logo_url)
+    lab_cover_bin_id = await insert_into_binary_table(db,lab.lab_cover_url)
 
     ## Contact Us table entry
     contact_entry = models.ContactUs(
@@ -181,6 +184,7 @@ async def create_lab(lab: schemas.LabAdd ,db: Session):
     lab_entry = models.Lab(
         name = lab.name,
         lab_logo_id = lab_logo_bin_id,
+        cover_binary_id = lab_cover_bin_id,
         overview = lab.overview,
         contact_id = contact_entry.id,
         twitter_handle = lab.twitter_handle,

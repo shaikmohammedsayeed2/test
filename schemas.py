@@ -17,6 +17,7 @@ class LabAdd(BaseModel):
     twitter_handle:str
     # Binaries
     lab_logo_url :str
+    lab_cover_url: str
 
 class PublicationAdd(BaseModel):
     pub_title: str

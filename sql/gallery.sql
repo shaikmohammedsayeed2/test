@@ -7,5 +7,5 @@ FROM
 	 	public."TBL_BINARY" as bin ON bin.id = GA.binary_id
 	)
 		
-WHERE EV.lab_id = 1
+WHERE EV.lab_id = {0}
 GROUP BY title,description;
