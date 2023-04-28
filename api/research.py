@@ -24,9 +24,12 @@ async def get_publications(lab_id:int, db: Session = Depends(get_db)):
 
 @router.get("/research/{lab_id}")
 async def get_publications(lab_id:int, db: Session = Depends(get_db)):
-    sql = text(Path("sql/research.sql").read_text().format(lab_id))
-    results = db.execute(sql)
-    return results.mappings().all()
+    response = dict()
+    upcoming_conference = db.execute(text(Path("sql/research_conference.sql").read_text().format(lab_id)))
+    response['upcoming_conference'] = upcoming_conference
+    top_5_papers = db.execute(text(Path("sql/research_publication.sql").read_text().format(lab_id)))
+    response['top_5_papers'] = top_5_papers
+    return response
 
 
 
