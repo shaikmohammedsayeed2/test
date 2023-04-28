@@ -93,3 +93,65 @@ class FeedbackAdd(BaseModel):
     email:str
     subject: str
     message: str
+
+class LabUpdate(BaseModel):
+    name: Optional[str]
+    overview: Optional[str]
+    address: Optional[str]
+    email: Optional[str]
+    phone: Optional[str]
+    twitter_handle:Optional[str]
+    # Binaries
+    lab_logo_url :Optional[str]
+    lab_cover_url: Optional[str]
+
+class PublicationUpdate(BaseModel):
+    pub_title: Optional[str]
+    description: Optional[str]
+    lab_id: Optional[int]
+    type: Optional[str]
+    pub_date : Optional[datetime.date]
+    # Binaries
+    pub_pdf:Optional[str] 
+
+class ConferenceUpdate(BaseModel):
+    conf_title: Optional[str]
+    description: Optional[str]
+    lab_id: Optional[int]
+    start_date : Optional[datetime.date]
+    end_date   : Optional[datetime.date]
+    # Binaries
+    conf_pdf:Optional[str]   
+
+class PatentUpdate(BaseModel):
+    publication_id:Optional[int]
+    description:Optional[str]
+    lab_id:Optional[int] 
+
+class EventUpdate(BaseModel):
+    lab_id: Optional[int]
+    title: Optional[str]
+    description: Optional[str]
+    event_date :Optional[datetime.date]
+    # Binaries
+    event_image: Optional[str] 
+
+class PosterDemoUpdate(BaseModel):
+    lab_id:Optional[int]
+    description: Optional[str]
+    type:Optional[str]
+    # Binaries
+    poster_demo_image: Optional[str]  
+    
+class SliderImageUpdate(BaseModel):
+    lab_id: Optional[int]
+    # Binaries
+    slider_image: Optional[str] 
+
+## Unable to edit Galeery since it will change all the images 
+
+
+
+class SignInData(BaseModel):
+    g_token:str
+    lab_id:int
