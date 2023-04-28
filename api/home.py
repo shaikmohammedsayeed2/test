@@ -30,6 +30,9 @@ async def get_home_details(lab_id:int, db: Session = Depends(get_db)):
     # Slider handle
     slider = db.execute(text(Path("sql/slider.sql").read_text().format(lab_id))).mappings().all()
     response['slider'] = slider
+    # News handle
+    news = db.execute(text(Path("sql/news.sql").read_text().format(lab_id))).mappings().all()
+    response['news'] = news
     ## Counts
     response["metrics"] = await get_resarch_metrics(lab_id,db)
     return response
