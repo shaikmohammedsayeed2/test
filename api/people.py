@@ -76,4 +76,4 @@ async def delete_labmember_by_id(labmember_id:int,db: Session = Depends(get_db))
     else:
         db.delete(db.get(models.LabMember,labmember_id))
     db.commit()
-    return "" 
+    return ""  

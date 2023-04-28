@@ -36,11 +36,14 @@ async def add_gallery_image(gallery: schemas.GalleryImageAdd ,db: Session = Depe
     db.commit()
     return 
 
-## to delete images from gallery
+## to delete images from gallery - Completed
 @router.delete("/images")
 async def delete_images_by_id(imageids:list[int],db: Session = Depends(get_db)) :
     for imageid in imageids:
-        db.delete(db.get(models.Gallery,imageid))
+        image = db.get(models.Gallery,imageid)
+        image_binary = db.get(models.Binary,image.binary_id)
+        db.delete(image)
+        db.delete(image_binary)
     db.commit()  
     return ""
 
@@ -64,10 +67,32 @@ async def add_slider_image(sli: schemas.SliderImageAdd ,db: Session = Depends(ge
 
     return sli_entry.id
 
+## To Update A Slider Image
+@router.put("/sliderimage/{slider_id}")
+async def update_slider_image(slider_id:int,slider: schemas.SliderImageUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.Slider).filter(models.Slider.id==slider_id).first()
+    db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.slider_binary_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+    
+    if slider.slider_image:
+        db_blob_storage.blob_storage = slider.slider_image
+
+    update_slider_data = {k: v for k, v in slider.dict(exclude_unset=True).items()}
+    for key, value in update_slider_data.items():
+        setattr(db_item, key, value)
+
+    db.commit()
+
+    return "Success"
 
 ## to delete a slider image
 @router.delete("/slider")
 async def delete_slider_image_by_id(slider_id:int,db: Session = Depends(get_db)):
-    db.delete(db.get(models.Slider,slider_id))
+    slider_image = db.get(models.Slider,slider_id)
+    slider_image_binary = db.get(models.Binary,slider_image.slider_binary_id)
+    db.delete(slider_image)
+    db.delete(slider_image_binary)
     db.commit()
     return ""

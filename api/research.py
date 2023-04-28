@@ -98,23 +98,83 @@ async def add_patent(patent: schemas.PatentAdd ,db: Session = Depends(get_db)):
 
     return patent_entry.id
 
+## To Update A Conference
+@router.put("/conference/{conf_id}")
+async def update_conference(conf_id:int,conf: schemas.ConferenceUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.Conference).filter(models.Conference.id==conf_id).first()
+    db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.conf_binary_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+    
+    if conf.conf_pdf:
+        db_blob_storage.blob_storage = conf.conf_pdf
 
-## to delete a lab
+    update_conference_data = {k: v for k, v in conf.dict(exclude_unset=True).items()}
+    for key, value in update_conference_data.items():
+        setattr(db_item, key, value)
+
+    db.commit()
+
+    return "Success"
+
+## to delete a conference - Completed
 @router.delete("/conference")
 async def delete_conference_by_id(conf_id:int,db: Session = Depends(get_db)):
-    db.delete(db.get(models.Conference,conf_id))
+    conference = db.get(models.Conference,conf_id)
+    conference_file = db.get(models.Binary,conference.conf_binary_id)
+    db.delete(conference)
+    db.delete(conference_file)
     db.commit()
     return "" 
 
+## To Update A Publication
+@router.put("/publication/{pub_id}")
+async def update_publication(pub_id:int,pub: schemas.PublicationUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.Publication).filter(models.Publication.id==pub_id).first()
+    db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.pub_binary_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+    
+    if pub.pub_pdf:
+        db_blob_storage.blob_storage = pub.pub_pdf
 
-## to delete a publication
+    update_publication_data = {k: v for k, v in pub.dict(exclude_unset=True).items()}
+    for key, value in update_publication_data.items():
+        setattr(db_item, key, value)
+
+    db.commit()
+
+    return "Success"
+
+## to delete a publication - Completed
 @router.delete("/publication")
 async def delete_publication_by_id(publication_id:int,db: Session = Depends(get_db)):
-    db.delete(db.get(models.Publication,publication_id))
+    publication = db.get(models.Publication,publication_id)
+    publication_file = db.get(models.Binary,publication.pub_binary_id)
+    db.delete(publication)
+    db.delete(publication_file)
     db.commit()
     return ""
 
-## to delete a patent
+## To Update a Patent
+@router.put("/patent/{patent_id}")
+async def update_patent(patent_id:int,patent: schemas.PatentUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.Patent).filter(models.Patent.id==patent_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+
+    update_patent_data = {k: v for k, v in patent.dict(exclude_unset=True).items()}
+    for key, value in update_patent_data.items():
+        setattr(db_item, key, value)
+
+    db.commit()
+
+    return "Success"
+
+## to delete a patent - Completed
 @router.delete("/patent")
 async def delete_patent_by_id(patent_id:int,db: Session = Depends(get_db)):
     db.delete(db.get(models.Patent,patent_id))
