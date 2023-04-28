@@ -587,4 +587,168 @@ async def delete_labmember_by_id(labmember_id:int,db: Session = Depends(get_db))
     else:
         db.delete(db.get(models.LabMember,labmember_id))
     db.commit()
-    return ""            
+    return ""  
+
+
+#####################################################################################
+# ########################## Update Api's ################################################
+# #############################################################################
+
+## To Update A Lab
+@app.put("/lab/{lab_id}")
+async def update_lab(lab_id:int,lab: schemas.LabUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.Lab).filter(models.Lab.id==lab_id).first()
+    db_contact = db.query(models.ContactUs).filter(models.ContactUs.id == db_item.contact_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+
+    if lab.lab_logo_url:
+        db_lab_logo_binary = db.query(models.Binary).filter(models.Binary.id==db_item.lab_logo_id).first()
+        db_lab_logo_binary.blob_storage = lab.lab_logo_url
+
+    if lab.lab_cover_url:
+        db_lab_cover_binary = db.query(models.Binary).filter(models.Binary.id==db_item.cover_binary_id).first()
+        db_lab_cover_binary.blob_storage = lab.lab_cover_url    
+    
+
+    update_lab_data = {k: v for k, v in lab.dict(exclude_unset=True).items()}
+    for key, value in update_lab_data.items():
+        setattr(db_item, key, value)
+        
+    
+    update_contact_data = {k: v for k, v in lab.dict(exclude_unset=True).items()}
+    for key, value in update_contact_data.items():
+        setattr(db_contact, key, value)    
+
+    db.commit()
+
+    return "Success"
+
+###########################################################################################
+         
+## To Update A Publication
+@app.put("/publication/{pub_id}")
+async def update_publication(pub_id:int,pub: schemas.PublicationUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.Publication).filter(models.Publication.id==pub_id).first()
+    db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.pub_binary_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+    
+    if pub.pub_pdf:
+        db_blob_storage.blob_storage = pub.pub_pdf
+
+    update_publication_data = {k: v for k, v in pub.dict(exclude_unset=True).items()}
+    for key, value in update_publication_data.items():
+        setattr(db_item, key, value)
+
+    db.commit()
+
+    return "Success"
+
+######################################################################################################
+
+## To Update A Conference
+@app.put("/conference/{conf_id}")
+async def update_conference(conf_id:int,conf: schemas.ConferenceUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.Conference).filter(models.Conference.id==conf_id).first()
+    db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.conf_binary_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+    
+    if conf.conf_pdf:
+        db_blob_storage.blob_storage = conf.conf_pdf
+
+    update_conference_data = {k: v for k, v in conf.dict(exclude_unset=True).items()}
+    for key, value in update_conference_data.items():
+        setattr(db_item, key, value)
+
+    db.commit()
+
+    return "Success"
+
+###########################################################################################################
+
+## To Update a Patent
+@app.put("/patent/{patent_id}")
+async def update_patent(patent_id:int,patent: schemas.PatentUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.Patent).filter(models.Patent.id==patent_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+
+    update_patent_data = {k: v for k, v in patent.dict(exclude_unset=True).items()}
+    for key, value in update_patent_data.items():
+        setattr(db_item, key, value)
+
+    db.commit()
+
+    return "Success"
+
+##########################################################################################################
+
+## To Update A Event
+@app.put("/event/{event_id}")
+async def update_event(event_id:int,event: schemas.EventUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.Events).filter(models.Events.id==event_id).first()
+    db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.binary_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+    
+    if event.event_image:
+        db_blob_storage.blob_storage = event.event_image
+
+    update_event_data = {k: v for k, v in event.dict(exclude_unset=True).items()}
+    for key, value in update_event_data.items():
+        setattr(db_item, key, value)
+
+    db.commit()
+
+    return "Success" 
+
+##############################################################################################################
+## To Update A Poster or Demo
+@app.put("/posterdemo/{posterdemo_id}")
+async def update_poster(posterdemo_id:int,posdem: schemas.PosterDemoUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.PosterDemo).filter(models.PosterDemo.id==posterdemo_id).first()
+    db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.binary_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+    
+    if posdem.poster_demo_image:
+        db_blob_storage.blob_storage = posdem.poster_demo_image
+
+    update_posterdemo_data = {k: v for k, v in posdem.dict(exclude_unset=True).items()}
+    for key, value in update_posterdemo_data.items():
+        setattr(db_item, key, value)
+
+    db.commit()
+
+    return "Success"
+
+##################################################################################################################
+## To Update A Slider Image
+@app.put("/sliderimage/{slider_id}")
+async def update_slider_image(slider_id:int,slider: schemas.SliderImageUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.Slider).filter(models.Slider.id==slider_id).first()
+    db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.slider_binary_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+    
+    if slider.slider_image:
+        db_blob_storage.blob_storage = slider.slider_image
+
+    update_slider_data = {k: v for k, v in slider.dict(exclude_unset=True).items()}
+    for key, value in update_slider_data.items():
+        setattr(db_item, key, value)
+
+    db.commit()
+
+    return "Success"
+
+#####################################################################################################################
