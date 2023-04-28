@@ -1,8 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
 from api import events,home,images,lab,other,people,research
+import session
 import uvicorn
+from session import check_access_level
+from fastapi.responses import JSONResponse
+
 
 tags_metadata = [
     {
@@ -31,6 +34,9 @@ tags_metadata = [
     },
     {
         "name": "Other"
+    },
+    {
+        "name":"Auth"
     }
 ]
 
@@ -45,6 +51,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+#Middleware to check access to CUD operations
+@app.middleware("http")
+async def check_access(request: Request, call_next):
+
+    if request.method != "GET" and request.url.path != "/auth/signin" :
+        try:
+            # This middleware executes non GET requests
+            # Add your middleware logic here
+            check_access_level(request.cookies)
+        except Exception as exc:
+            return JSONResponse(status_code=401,content={'reason': "Unauthorized access"})
+
+    response = await call_next(request)
+    return response
+
+
 # Include routers
 app.include_router(home.router,tags=["Home"])
 app.include_router(lab.router, tags=["Lab"])
@@ -53,12 +75,13 @@ app.include_router(research.router, tags=["Research"])
 app.include_router(events.router, tags=["Events"])
 app.include_router(images.router, tags=["Images"])
 app.include_router(other.router, tags=["Other"])
+app.include_router(session.router, tags=["Auth"])
 
 
 #Redirection to the docs [Only for debug]
-@app.get("/")
-def redirect():
-    return RedirectResponse("/docs")
+# @app.get("/")
+# def redirect():
+#     return RedirectResponse("/docs")
 
 
 if __name__ == "__main__":

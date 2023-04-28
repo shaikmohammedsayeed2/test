@@ -2,7 +2,6 @@ from pydantic import BaseModel
 import datetime
 from typing import Optional
 
-
 class Lab(BaseModel):
     id :int
     name: str
@@ -150,6 +149,7 @@ class SliderImageUpdate(BaseModel):
     # Binaries
     slider_image: Optional[str] 
 
+
 ## Unable to edit Galeery since it will change all the images  
 
 class PersonUpdate(BaseModel):
@@ -164,3 +164,11 @@ class PersonUpdate(BaseModel):
     user_role: Optional[str]
     # Binaries
     person_image: Optional[str]               
+
+## Unable to edit Galeery since it will change all the images 
+
+
+
+class SignInData(BaseModel):
+    g_token:str
+    lab_id:int
