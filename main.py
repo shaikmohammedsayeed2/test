@@ -54,7 +54,8 @@ app.add_middleware(
 #Middleware to check access to CUD operations
 @app.middleware("http")
 async def check_access(request: Request, call_next):
-    if request.method != "GET":
+
+    if request.method != "GET" and request.url.path != "/auth/signin" :
         try:
             # This middleware executes non GET requests
             # Add your middleware logic here

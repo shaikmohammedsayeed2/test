@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 import datetime
-
+from typing import Optional
 
 class Lab(BaseModel):
     id :int
