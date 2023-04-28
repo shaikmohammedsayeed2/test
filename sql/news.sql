@@ -5,5 +5,5 @@ FROM
     )
 		
 WHERE PB.lab_id = {0} 
-ORDER BY pub_date DESC
+ORDER BY PB.pub_date DESC
 LIMIT 4;
