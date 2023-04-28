@@ -5,7 +5,7 @@ FROM (
     INNER JOIN public."TBL_BINARY" AS bin ON bin.id = CO.conf_binary_id
 )
 WHERE CO.lab_id = {0} 
-AND CO.end_date >= CURRENT_DATE
+AND CO.end_date >= CURRENT_DATE;
 --UNION
 --(SELECT CO1.id, conf_title, description, blob_storage, end_date
 --FROM (
