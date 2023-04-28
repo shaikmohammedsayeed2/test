@@ -2,7 +2,8 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 import models, schemas
 from utils import get_db, insert_into_binary_table
-
+from sqlalchemy import text
+from pathlib import Path
 router = APIRouter()
 
 
