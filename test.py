@@ -517,63 +517,89 @@ async def add_gallery_image(gallery: schemas.GalleryImageAdd ,db: Session = Depe
 
 
 #####################################################
-## to delete images from gallery
+## to delete images from gallery - Completed
 @app.delete("/images")
 async def delete_images_by_id(imageids:list[int],db: Session = Depends(get_db)) :
     for imageid in imageids:
-        db.delete(db.get(models.Gallery,imageid))
+        image = db.get(models.Gallery,imageid)
+        image_binary = db.get(models.Binary,image.binary_id)
+        db.delete(image)
+        db.delete(image_binary)
     db.commit()  
     return ""
 ####################################################
-## to delete a lab
+## to delete a lab - Completed
 @app.delete("/lab")
 async def delete_lab_by_id(lab_id:int,db: Session = Depends(get_db)):
     lab = db.get(models.Lab,lab_id)
-    contactus = db.get(models.ContactUs,lab.contact_id) 
+    contactus = db.get(models.ContactUs,lab.contact_id)
+    logo_image = db.get(models.Binary,lab.lab_logo_id)
+    cover_image = db.get(models.Binary,lab.cover_binary_id) 
+    
+    sql = text(Path("sql/delete_lab.sql").read_text().format(lab_id))
+    
     db.delete(lab)
     db.delete(contactus)
+    db.delete(logo_image)
+    db.delete(cover_image)
+    db.execute(sql)
     db.commit()
     return ""
 ####################################################
-## to delete a lab
+## to delete a conference - Completed
 @app.delete("/conference")
 async def delete_conference_by_id(conf_id:int,db: Session = Depends(get_db)):
-    db.delete(db.get(models.Conference,conf_id))
+    conference = db.get(models.Conference,conf_id)
+    conference_file = db.get(models.Binary,conference.conf_binary_id)
+    db.delete(conference)
+    db.delete(conference_file)
     db.commit()
     return "" 
 ######################################################
-## to delete a publication
+## to delete a publication - Completed
 @app.delete("/publication")
 async def delete_publication_by_id(publication_id:int,db: Session = Depends(get_db)):
-    db.delete(db.get(models.Publication,publication_id))
+    publication = db.get(models.Publication,publication_id)
+    publication_file = db.get(models.Binary,publication.pub_binary_id)
+    db.delete(publication)
+    db.delete(publication_file)
     db.commit()
     return ""
 ########################################################
-## to delete a event
+## to delete a event - Completed
 @app.delete("/event")
 async def delete_event_by_id(event_id:int,db: Session = Depends(get_db)):
-    db.delete(db.get(models.Events,event_id))
+    event = db.get(models.Events,event_id)
+    event_cover_image = db.get(models.Binary,event.binary_id)
+    db.delete(event)
+    db.delete(event_cover_image)
     db.commit()
     return ""
 ########################################################
-## to delete a patent
+## to delete a patent - Completed
 @app.delete("/patent")
 async def delete_patent_by_id(patent_id:int,db: Session = Depends(get_db)):
     db.delete(db.get(models.Patent,patent_id))
     db.commit()
     return ""
 ########################################################
-## to delete a PosterDemo
+## to delete a PosterDemo - Completed
 @app.delete("/posterdemo")
 async def delete_posterdemo_by_id(posdem_id:int,db: Session = Depends(get_db)):
-    db.delete(db.get(models.PosterDemo,posdem_id))
+    poster = db.get(models.PosterDemo,posdem_id)
+    poster_binary = db.get(models.Binary,poster.binary_id)
+    db.delete(poster)
+    db.delete(poster_binary)
     db.commit()
     return "" 
 ########################################################
 ## to delete a slider image
 @app.delete("/slider")
 async def delete_slider_image_by_id(slider_id:int,db: Session = Depends(get_db)):
-    db.delete(db.get(models.Slider,slider_id))
+    slider_image = db.get(models.Slider,slider_id)
+    slider_image_binary = db.get(models.Binary,slider_image.slider_binary_id)
+    db.delete(slider_image)
+    db.delete(slider_image_binary)
     db.commit()
     return ""
 #######################################################
