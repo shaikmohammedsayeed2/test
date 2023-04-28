@@ -27,6 +27,7 @@ async def create_upload_file(file: UploadFile = File(...)):
 @router.post("/feedback")
 async def submit_feedback(feedback: schemas.FeedbackAdd ,db: Session = Depends(get_db)):
     feedback_entry = models.Feedback(
+        lab_id = feedback.lab_id,
         name = feedback.name,
         email = feedback.email,
         subject = feedback.subject,
@@ -39,4 +40,6 @@ async def submit_feedback(feedback: schemas.FeedbackAdd ,db: Session = Depends(g
 
     return feedback_entry.id
 
-
+@router.get("/feedback/{lab_id}")
+async def get_all_feedback(lab_id:int, db: Session = Depends(get_db)):
+    return db.query(models.Feedback).filter(models.Feedback.lab_id == lab_id).all()
