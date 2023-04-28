@@ -77,3 +77,33 @@ async def delete_labmember_by_id(labmember_id:int,db: Session = Depends(get_db))
         db.delete(db.get(models.LabMember,labmember_id))
     db.commit()
     return ""  
+
+## to update a person
+@router.put("/person/{person_id}")
+async def update_person(person_id:int,person: schemas.PersonUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.Person).filter(models.Person.id==person_id).first()
+    db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.profile_binary_id).first()
+    db_lab_member = db.query(models.LabMember).filter(models.LabMember.person_id == person_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+    
+    if person.person_image:
+        db_blob_storage.blob_storage = person.person_image
+
+    update_person_data = {k: v for k, v in person.dict(exclude_unset=True).items()}
+    for key, value in update_person_data.items():
+        setattr(db_item, key, value)
+    
+    if person.lab_id:
+        db_lab_member.lab_id = person.lab_id
+    
+    if person.person_role:
+        db_lab_member.person_role_id = PERSON_ROLE[person.person_role]
+    
+    if person.user_role:
+        db_lab_member.role_id = USER_ROLE[person.user_role]           
+
+    db.commit()
+
+    return "Success"
