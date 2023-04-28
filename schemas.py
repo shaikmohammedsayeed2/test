@@ -90,7 +90,8 @@ class GalleryImageAdd(BaseModel):
 
 
 class FeedbackAdd(BaseModel):
-    name:str
+    lab_id:int
+    name:str 
     email:str
     subject: str
     message: str
