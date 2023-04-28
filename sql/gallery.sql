@@ -1,5 +1,5 @@
 /* This gives us the images of an event for the gallery page */
-SELECT title,description, ARRAY_AGG(ROW(GA.ID, blob_storage)) as images
+SELECT title,description, ARRAY_AGG(ROW(GA.event_id,GA.ID, blob_storage)) as images
 FROM 
 	(
 		(public."TBL_EVENTS" as EV INNER JOIN public."TBL_GALLERY" as GA ON EV.id = GA.event_id) 
