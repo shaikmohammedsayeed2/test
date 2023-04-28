@@ -24,7 +24,7 @@ async def get_publications(lab_id:int, db: Session = Depends(get_db)):
 
 @router.get("/research/{lab_id}")
 async def get_publications(lab_id:int, db: Session = Depends(get_db)):
-    sql = text(Path("sql/conference.sql").read_text().format(lab_id))
+    sql = text(Path("sql/research.sql").read_text().format(lab_id))
     results = db.execute(sql)
     return results.mappings().all()
 

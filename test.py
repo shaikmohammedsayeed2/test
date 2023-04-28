@@ -778,3 +778,23 @@ async def update_slider_image(slider_id:int,slider: schemas.SliderImageUpdate ,d
     return "Success"
 
 #####################################################################################################################
+## To update a Person
+
+@app.put("/person/{person_id}")
+async def update_person(person_id:int,person: schemas.PersonUpdate ,db: Session=Depends(get_db)):
+    
+    db_item = db.query(models.Slider).filter(models.Slider.id==slider_id).first()
+    db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.slider_binary_id).first()
+    if not db_item:
+        return {"error":"Item not found"}
+    
+    if slider.slider_image:
+        db_blob_storage.blob_storage = slider.slider_image
+
+    update_slider_data = {k: v for k, v in slider.dict(exclude_unset=True).items()}
+    for key, value in update_slider_data.items():
+        setattr(db_item, key, value)
+
+    db.commit()
+
+    return "Success"

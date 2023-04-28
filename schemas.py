@@ -150,4 +150,17 @@ class SliderImageUpdate(BaseModel):
     # Binaries
     slider_image: Optional[str] 
 
-## Unable to edit Galeery since it will change all the images                 
+## Unable to edit Galeery since it will change all the images  
+
+class PersonUpdate(BaseModel):
+    name: Optional[str]
+    roll_number: Optional[str]
+    linkedin_url: Optional[str]
+    github_url: Optional[str]
+    personal_web_url: Optional[str]
+    # Role
+    lab_id: Optional[int]
+    person_role: Optional[str]
+    user_role: Optional[str]
+    # Binaries
+    person_image: Optional[str]               
