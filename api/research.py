@@ -156,6 +156,9 @@ async def update_publication(pub_id:int,pub: schemas.PublicationUpdate ,db: Sess
 async def delete_publication_by_id(publication_id:int,db: Session = Depends(get_db)):
     publication = db.get(models.Publication,publication_id)
     publication_file = db.get(models.Binary,publication.pub_binary_id)
+    patent_on_publication = db.query(models.Patent).filter(models.Patent.publication_id == publication_id).all()
+    for pat in patent_on_publication:
+        db.delete(pat)
     db.delete(publication)
     db.delete(publication_file)
     db.commit()
