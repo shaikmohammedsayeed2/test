@@ -210,7 +210,7 @@ class Feedback(Base):
     email = Column(String)
     subject = Column(String)
     message = Column(String)
-
+    lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
 
 
