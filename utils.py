@@ -26,10 +26,10 @@ async def insert_into_binary_table(db:Session, url:str):
     return bin_entry.id
 
 def get_role_name_by_id(role_id):
-    match role_id:
-        case 1:
-            return "admin"
-        case 2:
-            return "user"
-        case 3:
-            return "manager"
+    if role_id ==1:
+        return "admin"
+    elif role_id ==3:
+        return "user"
+    elif role_id ==2:
+        return "manager"
+    
