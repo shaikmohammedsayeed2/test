@@ -7,6 +7,8 @@ import schemas, models,utils
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
 import datetime ,time   
+from fastapi.responses import HTMLResponse
+from pathlib import Path
 
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -23,6 +25,8 @@ COOKIE_KEY = "rle_session"
 
 # This function verifies the JWT token and returns the decoded payload
 def check_access_level(cookies):
+    ## Remove this to validate api
+    return 
     rle_session = cookies.get(COOKIE_KEY)
     if not rle_session:
         raise HTTPException(status_code=401, detail='Token is missing')
@@ -38,10 +42,10 @@ def check_access_level(cookies):
 
 
 
-@router.get("/")
+@router.get("/",response_class=HTMLResponse)
 async def read_index(response: Response):
-    response.header["Referrer-Policy"]= "no-referrer-when-downgrade"
-    return FileResponse('index.html')
+    # response.header["Referrer-Policy"]= "no-referrer-when-downgrade"
+    return Path("index.html").read_text()
 
 
 @router.post("/auth/signin")
