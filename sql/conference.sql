@@ -1,5 +1,5 @@
 /* This gives us the list of conferences present*/
-SELECT CO.id,conf_title,description,blob_storage
+SELECT CO.id,conf_title,description,CO.start_date,CO.end_date,blob_storage
 FROM 
 	(
 		(public."TBL_CONFERENCE" as CO INNER JOIN public."TBL_BINARY" as bin ON bin.id = CO.conf_binary_id)
