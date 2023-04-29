@@ -2,9 +2,10 @@ import sqlalchemy
 from session import COOKIE_KEY
 import pytest
 
-from tests.base import client, authorized_jwt_token
+from tests.base import client, authorized_jwt_token, unauthorized_jwt_token
 
 lab_id = None
+event_id = None
 
 @pytest.fixture
 def context():
@@ -70,8 +71,10 @@ def test_post_event_with_valid_labid(context):
         "/event",
         json=event_data
     )
-
+    global event_id
     assert response.status_code == 200
+    event_id = response.json()
+
 
 @pytest.mark.order(4)
 def test_delete_lab_with_valid_id(context):
@@ -87,3 +90,21 @@ def test_delete_lab_with_invalid_id(context):
         resposne = client.delete(
             "/lab?lab_id=-1"
         )
+
+@pytest.mark.order(6)
+def test_delete_event_with_invalid_access(context):
+    client.cookies.set(COOKIE_KEY,unauthorized_jwt_token )
+    global event_id
+    
+    resposne = client.delete(
+        "/event?event_id={event_id}"
+    )
+
+@pytest.mark.order(7)
+def test_delete_event_with_valid_access(context):
+    client.cookies.set(COOKIE_KEY, authorized_jwt_token)
+    global event_id
+    
+    resposne = client.delete(
+        "/event?event_id={event_id}"
+    )
