@@ -18,6 +18,16 @@ async def get_people(lab_id:int, db: Session = Depends(get_db)):
     results = db.execute(sql)
     return results.mappings().all()
 
+## Function to get the person using person_id
+@router.get("/person/{person_id}")
+async def get_person(person_id:int, db:Session = Depends(get_db)):
+    response = dict()
+    person = db.get(models.Person,person_id)
+    response['person'] = person
+    person_image = db.get(models.Binary,person.profile_binary_id).blob_storage
+    response['person_image'] = person_image
+    return response
+
 
 @router.post("/person")
 async def add_person(person: schemas.PersonAdd ,db: Session = Depends(get_db)):
