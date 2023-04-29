@@ -72,8 +72,7 @@ async def add_conference(conf: schemas.ConferenceAdd ,db: Session = Depends(get_
         start_date = conf.start_date,
         end_date = conf.end_date,
 
-        lab_id = conf.lab_id,
-        is_active = conf.is_active,
+        lab_id = conf.lab_id
         #created_by = 1##TODO: Insert logeed in perosn id
     )
 
