@@ -5,7 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from database import Base
 from main import app
 from utils import get_db
-from session import COOKIE_KEY, JWT_SCERET
 
 SQLALCHEMY_DATABASE_URL = "postgresql://postgres:Pass%40Po-es.15@127.0.0.1/rlm_test"
 
