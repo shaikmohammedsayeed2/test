@@ -4,6 +4,7 @@ import models, schemas
 from sqlalchemy import text
 from pathlib import Path
 from utils import get_db, insert_into_binary_table
+import json
 
 router = APIRouter()
 
