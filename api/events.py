@@ -2,9 +2,18 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 import models, schemas
 from utils import get_db, insert_into_binary_table
+from sqlalchemy import text
+from pathlib import Path
 
 router = APIRouter()
 
+
+## Get All Events
+@router.get("/event/{lab_id}")
+async def get_all_events(lab_id:int, db: Session = Depends(get_db)):
+    sql = text(Path("sql/all_events.sql").read_text().format(lab_id))
+    results = db.execute(sql)
+    return results.mappings().all()
 
 ## Event creation
 @router.post("/event")
