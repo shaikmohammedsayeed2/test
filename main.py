@@ -54,14 +54,14 @@ app.add_middleware(
 #Middleware to check access to CUD operations
 @app.middleware("http")
 async def check_access(request: Request, call_next):
+    # This middleware executes non GET requests
+    if request.method != "GET" and request.url.path != "/auth/signin" : 
 
-    if request.method != "GET" and request.url.path != "/auth/signin" :
-        try:
-            # This middleware executes non GET requests
-            # Add your middleware logic here
-            check_access_level(request.cookies)
-        except Exception as exc:
+        ret = check_access_level(request.cookies)
+        if not ret:
+            print(ret,"Cookies:",request.cookies,"Cookies end")
             return JSONResponse(status_code=401,content={'reason': "Unauthorized access"})
+        
 
     response = await call_next(request)
     return response

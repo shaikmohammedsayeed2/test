@@ -17,7 +17,7 @@ async def create_upload_file(file: UploadFile = File(...)):
     container_client = blob_service_client.get_container_client(IMAGE_CONTAINER)
     blob_client = container_client.get_blob_client(file.filename)
     data = await file.read()
-    blob_client.upload_blob(data)
+    blob_client.upload_blob(data,overwrite=True)
     return {
         "url":blob_client.url,
         "filename": file.filename

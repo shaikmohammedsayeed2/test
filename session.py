@@ -26,17 +26,17 @@ COOKIE_KEY = "rle_session"
 # This function verifies the JWT token and returns the decoded payload
 def check_access_level(cookies):
     ## Remove this to validate api
-    return 
     rle_session = cookies.get(COOKIE_KEY)
     if not rle_session:
-        raise HTTPException(status_code=401, detail='Token is missing')
+        return "No token"
     try:
         decoded_token = jwt.decode(rle_session, JWT_SCERET,algorithms="HS256")
         if decoded_token["role_id"] !=1:
-            raise HTTPException(status_code=401, detail='Unauthorized access')
+            return "Invalid access level"
+        return True
     except (jwt.exceptions.InvalidTokenError, jwt.exceptions.InvalidSignatureError,ValueError, KeyError) as v:
         print(v.with_traceback())
-        raise HTTPException(status_code=401, detail='Token is invalid')
+        return "Invalid token"
     
 
 
@@ -69,7 +69,7 @@ async def after_sign_in(signin_data:schemas.SignInData, response:Response, db: S
             }
         # Creating a JWT and send cookie
         jwt_token = jwt.encode(jwt_payload,JWT_SCERET,algorithm="HS256")
-        response.set_cookie(COOKIE_KEY, jwt_token)
+        response.set_cookie(COOKIE_KEY, jwt_token,samesite="lax")
 
         return jwt_payload
     
@@ -92,7 +92,7 @@ async def after_sign_in(response:Response):
 def get_person_role_by_email(email:str,lab_id:int,db:Session):
     # get person id from email
     person = db.query(models.Person).filter(models.Person.roll_number == email).first()
-    print(person)
+    # print(person)
     if not person:
         raise HTTPException(status_code=401, detail='User not authorized for this lab')
     lab_member = db.query(models.LabMember).filter(models.LabMember.person_id == person.id,models.LabMember.lab_id==lab_id).first()
