@@ -1,6 +1,8 @@
+import datetime
+
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Date
 from sqlalchemy.orm import relationship
-import datetime
+
 from database import Base
 
 
@@ -10,7 +12,7 @@ class Binary(Base):
     blob_storage = Column(String)
     # blob_size = Column(Integer)
     is_active = Column(Boolean)
-    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id")) 
+    # created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_BINARY'
@@ -28,7 +30,7 @@ class Conference(Base):
     end_date = Column(Date)
 
     is_active = Column(Boolean)
-    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    # created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_CONFERENCE'
@@ -41,7 +43,7 @@ class ContactUs(Base):
     email = Column(String)
     phone = Column(String)
     is_active = Column(Boolean)
-    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    # created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_CONTACT_US'
@@ -56,22 +58,20 @@ class Lab(Base):
     overview = Column(String)
     contact_id = Column(Integer, ForeignKey("TBL_CONTACT_US.id"))
     is_active = Column(Boolean)
-    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    # created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
     twitter_handle = Column(String)
 
     ## Relation
     # _lab_members = relationship("LabMember")
     _lab_members = relationship("LabMember")
-    
 
     # _patents = relationship("Patents")
     # _conference = relationship("Conference")
     # _posterDemo = relationship("PosterDemo")
     # _publications = relationship("Publication")
 
-
-    _contact_us = relationship("ContactUs") 
+    _contact_us = relationship("ContactUs")
     _events = relationship("Events")
 
     __tablename__ = 'TBL_LAB'
@@ -101,8 +101,7 @@ class Person(Base):
     is_active = Column(Boolean)
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
     profile_binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
-    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
-
+    # created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
 
     __tablename__ = 'TBL_PERSON'
 
@@ -126,7 +125,7 @@ class Publication(Base):
 
     pub_date = Column(Date)
 
-    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    # created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
     type = Column(String)
 
@@ -136,7 +135,7 @@ class Publication(Base):
 class Role(Base):
     id = Column(Integer, primary_key=True, index=True)
 
-    role_name = Column(String)  
+    role_name = Column(String)
     is_active = Column(Boolean)
 
     __tablename__ = 'TBL_ROLE'
@@ -148,7 +147,7 @@ class Slider(Base):
     slider_binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
     is_active = Column(Boolean)
-    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    # created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_SLIDER'
@@ -162,8 +161,8 @@ class Events(Base):
     description = Column(String)
     binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     event_date = Column(Date)
-    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
-    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
+    # created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     is_active = Column(Boolean)
 
     __tablename__ = 'TBL_EVENTS'
@@ -175,8 +174,8 @@ class Patent(Base):
     publication_id = Column(Integer, ForeignKey("TBL_PUBLICATION.id"))
     description = Column(String)
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
-    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
-    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
+    # created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     is_active = Column(Boolean)
 
     __tablename__ = 'TBL_PATENT'
@@ -188,15 +187,16 @@ class PosterDemo(Base):
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
     binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
     description = Column(String)
-    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
-    #created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
+    # created_by = Column(Integer, ForeignKey("TBL_PERSON.id"))
     is_active = Column(Boolean)
     type = Column(String)
 
     __tablename__ = 'TBL_POSTER_DEMO'
 
+
 class Gallery(Base):
-    id = Column(Integer,primary_key=True, index=True )
+    id = Column(Integer, primary_key=True, index=True)
 
     event_id = Column(Integer, ForeignKey("TBL_EVENTS.id"))
     binary_id = Column(Integer, ForeignKey("TBL_BINARY.id"))
@@ -205,15 +205,12 @@ class Gallery(Base):
 
 
 class Feedback(Base):
-    id = Column(Integer,primary_key=True, index=True )
+    id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     email = Column(String)
     subject = Column(String)
     message = Column(String)
     lab_id = Column(Integer, ForeignKey("TBL_LAB.id"))
-    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow) 
-
+    created_at = Column(DateTime(timezone=False), default=datetime.datetime.utcnow)
 
     __tablename__ = 'TBL_FEEDBACK'
-
-

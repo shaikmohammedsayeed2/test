@@ -1,14 +1,17 @@
-from pydantic import BaseModel
 import datetime
 from typing import Optional
 
+from pydantic import BaseModel
+
+
 class Lab(BaseModel):
-    id :int
+    id: int
     name: str
     overview: str
 
     class Config:
         orm_mode = True
+
 
 class LabAdd(BaseModel):
     name: str
@@ -16,33 +19,37 @@ class LabAdd(BaseModel):
     address: str
     email: str
     phone: str
-    twitter_handle:str
+    twitter_handle: str
     # Binaries
-    lab_logo_url :str
+    lab_logo_url: str
     lab_cover_url: str
+
 
 class PublicationAdd(BaseModel):
     pub_title: str
     description: str
     lab_id: int
     type: str
-    pub_date : datetime.date
+    pub_date: datetime.date
     # Binaries
-    pub_pdf:str
+    pub_pdf: str
+
 
 class ConferenceAdd(BaseModel):
     conf_title: str
     description: str
     lab_id: int
-    start_date : datetime.date
-    end_date   : datetime.date
+    start_date: datetime.date
+    end_date: datetime.date
     # Binaries
-    conf_pdf:str
+    conf_pdf: str
+
 
 class ContactUsAdd(BaseModel):
     address: str
     email: str
     phone: str
+
 
 class PersonAdd(BaseModel):
     name: str
@@ -57,30 +64,35 @@ class PersonAdd(BaseModel):
     # Binaries
     person_image: str
 
+
 class PatentAdd(BaseModel):
-    publication_id:int
-    description:str
-    lab_id:int
+    publication_id: int
+    description: str
+    lab_id: int
+
 
 class EventAdd(BaseModel):
     lab_id: int
     title: str
     description: str
-    event_date : datetime.date
+    event_date: datetime.date
     # Binaries
     event_image: str
+
 
 class PosterDemoAdd(BaseModel):
     lab_id: int
     description: str
-    type:str
+    type: str
     # Binaries
     poster_demo_image: str
+
 
 class SliderImageAdd(BaseModel):
     lab_id: int
     # Binaries
     slider_image: str
+
 
 class GalleryImageAdd(BaseModel):
     event_id: int
@@ -89,20 +101,22 @@ class GalleryImageAdd(BaseModel):
 
 
 class FeedbackAdd(BaseModel):
-    lab_id:int
-    name:str 
-    email:str
+    lab_id: int
+    name: str
+    email: str
     subject: str
     message: str
+
 
 class NewEventAdd(BaseModel):
     lab_id: int
     title: str
     description: str
-    event_date : datetime.date
+    event_date: datetime.date
     # Binaries
-    event_image: str 
-    gallery_images_url: list[str]   
+    event_image: str
+    gallery_images_url: list[str]
+
 
 class LabUpdate(BaseModel):
     name: Optional[str]
@@ -110,56 +124,62 @@ class LabUpdate(BaseModel):
     address: Optional[str]
     email: Optional[str]
     phone: Optional[str]
-    twitter_handle:Optional[str]
+    twitter_handle: Optional[str]
     # Binaries
-    lab_logo_url :Optional[str]
+    lab_logo_url: Optional[str]
     lab_cover_url: Optional[str]
+
 
 class PublicationUpdate(BaseModel):
     pub_title: Optional[str]
     description: Optional[str]
     lab_id: Optional[int]
     type: Optional[str]
-    pub_date : Optional[datetime.date]
+    pub_date: Optional[datetime.date]
     # Binaries
-    pub_pdf:Optional[str] 
+    pub_pdf: Optional[str]
+
 
 class ConferenceUpdate(BaseModel):
     conf_title: Optional[str]
     description: Optional[str]
     lab_id: Optional[int]
-    start_date : Optional[datetime.date]
-    end_date   : Optional[datetime.date]
+    start_date: Optional[datetime.date]
+    end_date: Optional[datetime.date]
     # Binaries
-    conf_pdf:Optional[str]   
+    conf_pdf: Optional[str]
+
 
 class PatentUpdate(BaseModel):
-    publication_id:Optional[int]
-    description:Optional[str]
-    lab_id:Optional[int] 
+    publication_id: Optional[int]
+    description: Optional[str]
+    lab_id: Optional[int]
+
 
 class EventUpdate(BaseModel):
     lab_id: Optional[int]
     title: Optional[str]
     description: Optional[str]
-    event_date :Optional[datetime.date]
+    event_date: Optional[datetime.date]
     # Binaries
-    event_image: Optional[str] 
+    event_image: Optional[str]
+
 
 class PosterDemoUpdate(BaseModel):
-    lab_id:Optional[int]
+    lab_id: Optional[int]
     description: Optional[str]
-    type:Optional[str]
+    type: Optional[str]
     # Binaries
-    poster_demo_image: Optional[str]  
-    
+    poster_demo_image: Optional[str]
+
+
 class SliderImageUpdate(BaseModel):
     lab_id: Optional[int]
     # Binaries
-    slider_image: Optional[str] 
-
+    slider_image: Optional[str]
 
 ## Unable to edit Galeery since it will change all the images  
+
 
 class PersonUpdate(BaseModel):
     name: Optional[str]
@@ -172,14 +192,11 @@ class PersonUpdate(BaseModel):
     person_role: Optional[str]
     user_role: Optional[str]
     # Binaries
-    person_image: Optional[str]               
+    person_image: Optional[str]
 
 ## Unable to edit Galeery since it will change all the images 
 
 
-
 class SignInData(BaseModel):
-    g_token:str
-    lab_id:int
-    
-    
+    g_token: str
+    lab_id: int

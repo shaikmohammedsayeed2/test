@@ -1,10 +1,9 @@
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from api import events,home,images,lab,other,people,research,auth
-import session
 import uvicorn
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
+from api import events, home, images, lab, other, people, research, auth
 
 tags_metadata = [
     {
@@ -35,10 +34,9 @@ tags_metadata = [
         "name": "Other"
     },
     {
-        "name":"Auth"
+        "name": "Auth"
     }
 ]
-
 
 app = FastAPI(openapi_tags=tags_metadata)
 
@@ -50,9 +48,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # Include routers
-app.include_router(home.router,tags=["Home"])
+app.include_router(home.router, tags=["Home"])
 app.include_router(lab.router, tags=["Lab"])
 app.include_router(people.router, tags=["Person"])
 app.include_router(research.router, tags=["Research"])
