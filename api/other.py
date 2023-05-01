@@ -55,6 +55,8 @@ async def delete_all_feedbacks_by_id(feedback_ids:list[int],db: Session = Depend
 
 @router.delete("/feedback/{lab_id}")
 async def delete_all_feedbacks_by_labid(lab_id:int,db: Session = Depends(get_db)):
-    db_feedbacks = db.query(models.Feedback).filter(models.Feedback.lab_id == lab_id).all()  
-    db.delete(db_feedbacks)
+    db_feedbacks = db.query(models.Feedback).filter(models.Feedback.lab_id == lab_id).all()
+    for feedback in db_feedbacks:
+        db.delete(feedback)
+    db.commit()
     return ""
