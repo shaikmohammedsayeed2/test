@@ -23,7 +23,7 @@ class RleSession:
 
 
         if no_session:
-            self.valid = no_session
+            self.valid = False
             self.reason = jwt_payload
         else:
 
@@ -66,8 +66,8 @@ def get_rle_session(request: Request):
         decoded_token = jwt.decode(rle_session_ck, JWT_SCERET, algorithms="HS256")
         return RleSession(decoded_token)
 
-    except (jwt.exceptions.InvalidTokenError, jwt.exceptions.InvalidSignatureError, ValueError, KeyError) as v:
-        print(v.with_traceback())
+    except Exception as v:
+        # print(v.with_traceback())
         return RleSession("Invalid Token", no_session=True)
 
 
