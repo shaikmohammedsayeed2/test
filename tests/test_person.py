@@ -1,8 +1,11 @@
 import models
 from tests.base import *
 from fastapi.encoders import jsonable_encoder
+from session import COOKIE_KEY
 
-def create_person(lab_id):
+
+
+def create_person(lab_id, auth_cookie):
     person_data = {
         "name": "string",
         "roll_number": "string",
@@ -14,6 +17,8 @@ def create_person(lab_id):
         "user_role": "admin",
         "person_image": "string"
     }
+
+    client.cookies.set(COOKIE_KEY, auth_cookie)
 
     response = client.post("/person", json=person_data)
     return response
@@ -28,7 +33,7 @@ def test_get_person():
     lab_id = response.json()
     
     # Create a new person from helper function
-    response = create_person(lab_id)
+    response = create_person(lab_id, authorized_jwt_token_admin)
     assert response.status_code == 200
 
     person_id = response.json()
@@ -47,7 +52,7 @@ def test_create_person():
     lab_id = response.json()
     
     # Create a new person from helper function
-    response = create_person(lab_id)
+    response = create_person(lab_id, authorized_jwt_token_admin)
     assert response.status_code == 200
 
     person_id = response.json()
@@ -69,7 +74,7 @@ def test_update_person():
     lab_id = response.json()
     
     # Create a new person from helper function
-    response = create_person(lab_id)
+    response = create_person(lab_id, authorized_jwt_token_admin)
     assert response.status_code == 200
 
     person_id = response.json()
@@ -86,6 +91,8 @@ def test_update_person():
         person.person_role = "faculty"
         person.user_role = "manager"
         person.person_image = "Updated person_image"
+
+        client.cookies.set(COOKIE_KEY, authorized_jwt_token_admin)
 
         # Update using the Update API
         response = client.put(
@@ -121,7 +128,7 @@ def test_delete_person():
     lab_id = response.json()
     
     # Create a new person from helper function
-    response = create_person(lab_id)
+    response = create_person(lab_id, authorized_jwt_token_admin)
     assert response.status_code == 200
 
     person_id = response.json()
@@ -130,6 +137,8 @@ def test_delete_person():
     with TestingSessionLocal() as mock_db:
         lab_member = mock_db.query(models.LabMember).filter(models.LabMember.person_id == person_id).first()
         assert lab_member is not None
+
+        client.cookies.set(COOKIE_KEY, authorized_jwt_token_admin)
 
         # Delete using the Delete API
         response = client.delete(
@@ -140,3 +149,83 @@ def test_delete_person():
         # Query mock db for person deletion
         person = mock_db.query(models.Person).filter(models.Person.id == person_id).first()
         assert person is None
+
+
+# Unit test for Person Create without neccesary access
+def test_create_person_access_levels():
+    # Create a new lab 
+    response = create_new_lab()
+    # Check for status code 
+    assert response.status_code == 200
+    lab_id = response.json()
+    
+    # Create a new person Unauthorized
+    response = create_person(lab_id, unauthorized_jwt_token)
+    assert response.status_code == 401
+
+    # Create a new person Unauthorized
+    response = create_person(lab_id, authorized_jwt_token_user)
+    assert response.status_code == 401
+
+
+
+# Unit test for Person Update without neccesary access
+def test_update_person_access_levels():
+    # Create a new lab 
+    response = create_new_lab()
+    # Check for status code 
+    assert response.status_code == 200
+    lab_id = response.json()
+    
+    # Create a new person from helper function
+    response = create_person(lab_id, authorized_jwt_token_admin)
+    assert response.status_code == 200
+
+    person_id = response.json()
+    
+    # Get lab_member id from db
+    with TestingSessionLocal() as mock_db:
+        lab_member = mock_db.query(models.LabMember).filter(models.LabMember.person_id == person_id).first()
+        assert lab_member is not None
+
+        # Unauthorized
+        client.cookies.set(COOKIE_KEY, unauthorized_jwt_token)
+        response = client.delete("/person?labmember_id={0}".format(lab_member.id))
+        assert response.status_code == 401
+
+        # User
+        client.cookies.set(COOKIE_KEY, authorized_jwt_token_user)
+        response = client.delete("/person?labmember_id={0}".format(lab_member.id))
+
+        assert response.status_code == 401
+
+
+# Unit test for Person Delete without neccesary access
+def test_delete_person_access_levels():
+    # Create a new lab 
+    response = create_new_lab()
+    # Check for status code 
+    assert response.status_code == 200
+    lab_id = response.json()
+    
+    # Create a new person from helper function
+    response = create_person(lab_id, authorized_jwt_token_admin)
+    assert response.status_code == 200
+
+    person_id = response.json()
+    
+    # Get lab_member id from db
+    with TestingSessionLocal() as mock_db:
+        lab_member = mock_db.query(models.LabMember).filter(models.LabMember.person_id == person_id).first()
+        assert lab_member is not None
+
+        # Unauthorized
+        client.cookies.set(COOKIE_KEY, unauthorized_jwt_token)
+        response = client.delete("/person?labmember_id={0}".format(lab_member.id))
+        assert response.status_code == 401
+
+        # User
+        client.cookies.set(COOKIE_KEY, authorized_jwt_token_user)
+        response = client.delete("/person?labmember_id={0}".format(lab_member.id))
+
+        assert response.status_code == 401
