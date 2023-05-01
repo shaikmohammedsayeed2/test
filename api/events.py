@@ -22,6 +22,10 @@ async def get_all_events(lab_id: int, user: RleSession = Depends(get_session), d
 async def add_event(event: schemas.EventAdd, user: RleSession = Depends(get_session), db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["user"])
 
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != event.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     event_bin_id = await insert_into_binary_table(db, event.event_image)
 
     ## Event Table entry
@@ -48,6 +52,10 @@ async def add_new_event(event: schemas.NewEventAdd, user: RleSession = Depends(g
                         db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["manager"])
 
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != event.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     event_bin_id = await insert_into_binary_table(db, event.event_image)
 
     event_entry = models.Events(
@@ -90,6 +98,10 @@ async def update_event(event_id: int, event: schemas.EventUpdate, user: RleSessi
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.binary_id).first()
     if not db_item:
         return {"error": "Item not found"}
+    
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != db_item.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     if event.event_image:
         db_blob_storage.blob_storage = event.event_image
@@ -109,6 +121,11 @@ async def delete_event_by_id(event_id: int, user: RleSession = Depends(get_sessi
     CHECK_ACCESS(user, USER_ROLE["manager"])
 
     event = db.get(models.Events, event_id)
+
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != event.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     event_cover_image = db.get(models.Binary, event.binary_id)
     db.delete(event)
     db.commit()
@@ -121,8 +138,12 @@ async def delete_event_by_id(event_id: int, user: RleSession = Depends(get_sessi
 @router.post("/posterdemo")
 async def add_poster_demo(posdem: schemas.PosterDemoAdd, user: RleSession = Depends(get_session),
                           db: Session = Depends(get_db)):
-    CHECK_ACCESS(user, USER_ROLE["manager"])
+    CHECK_ACCESS(user, USER_ROLE["user"])
 
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != posdem.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     posdem_bin_id = await insert_into_binary_table(db, posdem.poster_demo_image)
 
     ## Event Table entry
@@ -146,10 +167,15 @@ async def add_poster_demo(posdem: schemas.PosterDemoAdd, user: RleSession = Depe
 async def delete_posterdemo_by_id(posdem_id: int, user: RleSession = Depends(get_session),
                                   db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["manager"])
-
+    
     poster = db.get(models.PosterDemo, posdem_id)
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != poster.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     poster_binary = db.get(models.Binary, poster.binary_id)
     db.delete(poster)
+    db.commit()
     db.delete(poster_binary)
     db.commit()
     return ""
@@ -159,13 +185,17 @@ async def delete_posterdemo_by_id(posdem_id: int, user: RleSession = Depends(get
 @router.put("/posterdemo/{posterdemo_id}")
 async def update_poster(posterdemo_id: int, posdem: schemas.PosterDemoUpdate, user: RleSession = Depends(get_session),
                         db: Session = Depends(get_db)):
-    CHECK_ACCESS(user, USER_ROLE["manager"])
-
+    CHECK_ACCESS(user, USER_ROLE["user"])
+    
     db_item = db.query(models.PosterDemo).filter(models.PosterDemo.id == posterdemo_id).first()
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.binary_id).first()
     if not db_item:
         return {"error": "Item not found"}
 
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != db_item.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     if posdem.poster_demo_image:
         db_blob_storage.blob_storage = posdem.poster_demo_image
 

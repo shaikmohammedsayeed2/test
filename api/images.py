@@ -21,6 +21,7 @@ async def get_gallery(lab_id: int, user: RleSession = Depends(get_session), db: 
 async def add_gallery_image(gallery: schemas.GalleryImageAdd, user: RleSession = Depends(get_session),
                             db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["manager"])
+    
 
     for image in gallery.gallery_images_url:
         gallery_bin_id = await insert_into_binary_table(db, image)
@@ -59,8 +60,13 @@ async def delete_images_by_id(imageids: list[int], user: RleSession = Depends(ge
 @router.post("/sliderimage")
 async def add_slider_image(sli: schemas.SliderImageAdd, user: RleSession = Depends(get_session),
                            db: Session = Depends(get_db)):
-    CHECK_ACCESS(user, USER_ROLE["user"])
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
 
+     # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != sli.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     sli_bin_id = await insert_into_binary_table(db, sli.slider_image)
 
     ## Slider Table entry
@@ -82,13 +88,19 @@ async def add_slider_image(sli: schemas.SliderImageAdd, user: RleSession = Depen
 @router.put("/sliderimage/{slider_id}")
 async def update_slider_image(slider_id: int, slider: schemas.SliderImageUpdate,
                               user: RleSession = Depends(get_session), db: Session = Depends(get_db)):
-    CHECK_ACCESS(user, USER_ROLE["user"])
-
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+    
+    
     db_item = db.query(models.Slider).filter(models.Slider.id == slider_id).first()
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.slider_binary_id).first()
     if not db_item:
         return {"error": "Item not found"}
 
+     # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != db_item.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     if slider.slider_image:
         db_blob_storage.blob_storage = slider.slider_image
 
@@ -106,8 +118,13 @@ async def update_slider_image(slider_id: int, slider: schemas.SliderImageUpdate,
 async def delete_slider_image_by_id(slider_id: int, user: RleSession = Depends(get_session),
                                     db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["manager"])
-
+    
     slider_image = db.get(models.Slider, slider_id)
+    
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != slider_image.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     slider_image_binary = db.get(models.Binary, slider_image.slider_binary_id)
     db.delete(slider_image)
     db.commit()

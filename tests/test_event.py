@@ -20,6 +20,8 @@ def create_new_event(lab_id:int,auth_cookie):
 
     return response
 
+
+
 # Unit test for event retrieval
 def test_get_event():
     lab_response = create_new_lab()
@@ -61,6 +63,8 @@ def test_create_event():
         event = mock_db.query(models.Events).filter(models.Events.id == event_id).first()
         assert event and event.id == event_id
 
+
+
 # Unit test for event update
 def test_update_event():
     lab_response = create_new_lab()
@@ -101,6 +105,8 @@ def test_update_event():
         assert event.event_date == updated_event.event_date
         assert event.binary_id == updated_event.binary_id
         
+
+
 def test_delete_event():
     lab_response = create_new_lab()
     
@@ -125,6 +131,8 @@ def test_delete_event():
         event = mock_db.query(models.Events).filter(models.Events.id==event_id).first()
         assert event is None
 
+
+
 def test_create_event_access_levels():
     lab_response = create_new_lab()
     
@@ -143,9 +151,9 @@ def test_create_event_access_levels():
     assert event_response.status_code == 200
     
     # Create a new event by user of different lab
-    #cookie = create_auth_token("user",lab_id-1)
-    #event_response = create_new_event(lab_id,cookie)
-    #assert event_response.status_code == 401
+    cookie = create_auth_token("user",lab_id-1)
+    event_response = create_new_event(lab_id,cookie)
+    assert event_response.status_code == 401
     
     # Create a new event by manager of same lab
     cookie = create_auth_token("manager",lab_id)
@@ -153,9 +161,9 @@ def test_create_event_access_levels():
     assert event_response.status_code == 200
     
     # Create a new event by manager of different lab
-    #cookie = create_auth_token("manager",lab_id-1)
-    #event_response = create_new_event(lab_id,cookie)
-    #assert event_response.status_code == 401
+    cookie = create_auth_token("manager",lab_id-1)
+    event_response = create_new_event(lab_id,cookie)
+    assert event_response.status_code == 401
 
 def test_update_event_access_levels():
     lab_response = create_new_lab()
@@ -196,13 +204,13 @@ def test_update_event_access_levels():
         assert response.status_code == 200
         
         # Update by user of different lab
-        #cookie = create_auth_token("user",lab_id-1)
-        #client.cookies.set(COOKIE_KEY, cookie)
-        #response = client.put(
-        #    "/event/{0}".format(event_id),
-        #    json = jsonable_encoder(event)
-        #)
-        #assert response.status_code == 401
+        cookie = create_auth_token("user",lab_id-1)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put(
+           "/event/{0}".format(event_id),
+           json = jsonable_encoder(event)
+        )
+        assert response.status_code == 401
         
         # Update by manager of same lab
         cookie = create_auth_token("manager",lab_id)
@@ -214,13 +222,13 @@ def test_update_event_access_levels():
         assert response.status_code == 200
         
         # Update by manager of different lab
-        #cookie = create_auth_token("manager",lab_id-1)
-        #client.cookies.set(COOKIE_KEY, cookie)
-        #response = client.put(
-        #    "/event/{0}".format(event_id),
-        #    json = jsonable_encoder(event)
-        #)
-        #assert response.status_code == 401
+        cookie = create_auth_token("manager",lab_id-1)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put(
+           "/event/{0}".format(event_id),
+           json = jsonable_encoder(event)
+        )
+        assert response.status_code == 401
 
 def test_delete_event_access_levels():
     lab_response = create_new_lab()
@@ -245,12 +253,12 @@ def test_delete_event_access_levels():
     assert response.status_code == 401
     
     # Delete by manager of different lab
-    #cookie = create_auth_token("manager",lab_id-1)
-    #client.cookies.set(COOKIE_KEY, cookie)
-    #response = client.delete(
-    #    "/event?event_id={0}".format(event_id)
-    #)
-    #assert response.status_code == 401 
+    cookie = create_auth_token("manager",lab_id-1)
+    client.cookies.set(COOKIE_KEY, cookie)
+    response = client.delete(
+       "/event?event_id={0}".format(event_id)
+    )
+    assert response.status_code == 401 
     
     # Delete by manager of same lab
     cookie = create_auth_token("manager",lab_id)

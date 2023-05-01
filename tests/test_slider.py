@@ -108,15 +108,11 @@ def test_create_slider_access_levels():
     sli_response = create_new_slider_image(lab_id,unauthorized_jwt_token)
     assert sli_response.status_code == 401
     
-    # Create a new slider by user of same lab
-    cookie = create_auth_token("user",lab_id)
+       
+    # Create a new slider by user
+    cookie = create_auth_token("user")
     slider_response = create_new_slider_image(lab_id,cookie)
-    assert slider_response.status_code == 200
-    
-    # Create a new slider by user of different lab
-    #cookie = create_auth_token("user",lab_id-1)
-    #slider_response = create_new_slider_image(lab_id,cookie)
-    #assert pub_response.status_code == 401
+    assert slider_response.status_code == 401
     
     # Create a new slider by manager of same lab
     cookie = create_auth_token("manager",lab_id)
@@ -124,9 +120,9 @@ def test_create_slider_access_levels():
     assert slider_response.status_code == 200
     
     # Create a new slider by manager of different lab
-    #cookie = create_auth_token("manager",lab_id-1)
-    #slider_response = create_new_slider(lab_id,cookie)
-    #assert slider_response.status_code == 401
+    cookie = create_auth_token("manager",lab_id-1)
+    slider_response = create_new_slider_image(lab_id,cookie)
+    assert slider_response.status_code == 401
 
 
 def test_update_slider_access_levels():
@@ -156,23 +152,16 @@ def test_update_slider_access_levels():
         ) 
         assert response.status_code == 401
         
-        # Update by user of same lab
-        cookie = create_auth_token("user",lab_id)
+    
+        
+        # Update by user
+        cookie = create_auth_token("user")
         client.cookies.set(COOKIE_KEY, cookie)
         response = client.put(
-            "/sliderimage/{0}".format(slider_id),
-            json = jsonable_encoder(slider)
+           "/sliderimage/{0}".format(slider_id),
+           json = jsonable_encoder(slider)
         ) 
-        assert response.status_code == 200
-        
-        # Update by user of different lab
-        #cookie = create_auth_token("user",lab_id-1)
-        #client.cookies.set(COOKIE_KEY, cookie)
-        #response = client.put(
-        #    "/sliderimage/{0}".format(slider_id),
-        #    json = jsonable_encoder(slider)
-        #) 
-        #assert response.status_code == 401
+        assert response.status_code == 401
         
         # Update by manager of same lab
         cookie = create_auth_token("manager",lab_id)
@@ -184,13 +173,13 @@ def test_update_slider_access_levels():
         assert response.status_code == 200
         
         # Update by manager of different lab
-        #cookie = create_auth_token("manager",lab_id-1)
-        #client.cookies.set(COOKIE_KEY, cookie)
-        #response = client.put(
-        #    "/sliderimage/{0}".format(slider_id),
-        #    json = jsonable_encoder(slider)
-        #) 
-        #assert response.status_code == 401 
+        cookie = create_auth_token("manager",lab_id-1)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put(
+           "/sliderimage/{0}".format(slider_id),
+           json = jsonable_encoder(slider)
+        ) 
+        assert response.status_code == 401 
 
 
 def test_delete_slider_access_levels():
@@ -216,12 +205,12 @@ def test_delete_slider_access_levels():
     assert response.status_code == 401
     
     # Delete by manager of different lab
-    #cookie = create_auth_token("manager",lab_id-1)
-    #client.cookies.set(COOKIE_KEY, cookie)
-    #response = client.delete(
-    #    "/slider?slider_id={0}".format(slider_id)
-    #)
-    #assert response.status_code == 401 
+    cookie = create_auth_token("manager",lab_id-1)
+    client.cookies.set(COOKIE_KEY, cookie)
+    response = client.delete(
+       "/slider?slider_id={0}".format(slider_id)
+    )
+    assert response.status_code == 401 
     
     # Delete by manager of same lab
     cookie = create_auth_token("manager",lab_id)
