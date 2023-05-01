@@ -28,6 +28,7 @@ async def after_sign_in(signin_data: schemas.SignInData, response: Response, db:
             "name": idinfo['name'],
             "email": idinfo['email'],
             "role_id": role_id,
+            "lab_id": signin_data.lab_id,
             "person_id": person_id,
             "role_name": utils.get_role_name_by_id(role_id)
         }
