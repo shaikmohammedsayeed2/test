@@ -95,6 +95,15 @@ class FeedbackAdd(BaseModel):
     subject: str
     message: str
 
+class NewEventAdd(BaseModel):
+    lab_id: int
+    title: str
+    description: str
+    event_date : datetime.date
+    # Binaries
+    event_image: str 
+    gallery_images_url: list[str]   
+
 class LabUpdate(BaseModel):
     name: Optional[str]
     overview: Optional[str]
@@ -172,3 +181,5 @@ class PersonUpdate(BaseModel):
 class SignInData(BaseModel):
     g_token:str
     lab_id:int
+    
+    

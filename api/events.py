@@ -37,6 +37,40 @@ async def add_event(event: schemas.EventAdd ,db: Session = Depends(get_db)):
 
     return event_entry.id
 
+## New Event Creation Api Along with gallery
+@router.post("/newevent")
+async def add_new_event(event:schemas.NewEventAdd, db:Session = Depends(get_db)):
+    event_bin_id = await insert_into_binary_table(db,event.event_image)
+    
+    event_entry = models.Events(
+        lab_id = event.lab_id,
+        title = event.title,
+        description = event.description,
+        event_date = event.event_date,
+        binary_id = event_bin_id,
+        is_active = True
+    )
+    
+    db.add(event_entry)
+    db.commit()
+    db.refresh(event_entry)
+    
+    created_event_id = event_entry.id
+    
+    for image in event.gallery_images_url:
+        gallery_bin_id = await insert_into_binary_table(db,image)
+        
+        gallery_entry = models.Gallery(
+            event_id = created_event_id,
+            binary_id = gallery_bin_id
+        )
+        
+        db.add(gallery_entry)
+    
+    db.commit()
+    
+    return created_event_id    
+
 ## To Update A Event
 @router.put("/event/{event_id}")
 async def update_event(event_id:int,event: schemas.EventUpdate ,db: Session=Depends(get_db)):
