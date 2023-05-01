@@ -6,7 +6,7 @@ from fastapi import Request
 
 
 PERSON_ROLE = {"student" : 1,"faculty" : 2,"staff" : 3,"sponsor":4}
-USER_ROLE = {"admin":1,"user":2,"manager":3}
+USER_ROLE = {"admin":1,"manager":2,"user":3}
 
 
 # Dependency
@@ -18,7 +18,7 @@ def get_db():
         db.close()
 
 def get_session(request:Request):
-    return get_rle_session(request),get_db()
+    return get_rle_session(request)
 
 
 async def insert_into_binary_table(db:Session, url:str):
@@ -43,5 +43,6 @@ def get_role_name_by_id(role_id):
         return "manager"
     
 def CHECK_ACCESS(user:RleSession, MIN_ACCESS_LEVEL:int):
-    if user.valid == False or user.role_id <= MIN_ACCESS_LEVEL:
+    if user.valid == False or user.role_id > MIN_ACCESS_LEVEL:
+        print(user, "Required Access Level: ", MIN_ACCESS_LEVEL)
         raise HTTPException(status_code=401, detail="Unauthorized")

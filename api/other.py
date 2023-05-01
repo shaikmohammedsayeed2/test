@@ -13,7 +13,11 @@ IMAGE_CONTAINER = "rleassests"
 
 
 @router.post("/uploadfile/")
-async def create_upload_file(file: UploadFile = File(...)):
+async def create_upload_file(file: UploadFile = File(...), user:RleSession = Depends(get_session)):
+
+    CHECK_ACCESS(user, USER_ROLE["user"])
+
+
     blob_service_client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
     container_client = blob_service_client.get_container_client(IMAGE_CONTAINER)
     blob_client = container_client.get_blob_client(file.filename)
@@ -47,6 +51,9 @@ async def get_all_feedback(lab_id:int, user:RleSession = Depends(get_session), d
 
 @router.delete("/feedback")
 async def delete_all_feedbacks_by_id(feedback_ids:list[int],user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
     for feedid in feedback_ids:
         feedback = db.get(models.Feedback,feedid)
         db.delete(feedback)
@@ -56,6 +63,9 @@ async def delete_all_feedbacks_by_id(feedback_ids:list[int],user:RleSession = De
 
 @router.delete("/feedback/{lab_id}")
 async def delete_all_feedbacks_by_labid(lab_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
     db_feedbacks = db.query(models.Feedback).filter(models.Feedback.lab_id == lab_id).all()
     for feedback in db_feedbacks:
         db.delete(feedback)

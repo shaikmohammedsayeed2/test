@@ -12,43 +12,55 @@ COOKIE_KEY = "rle_session"
 
 
 class RleSession:
-    def __init__(self, user_id, name, email, role_id, person_id, role_name):
-        self.userid = user_id
-        self:name =  name
-        self.email = email
-        self.role_id = role_id
-        self.person_id = person_id
-        self.role_name = role_name
-        self.valid = True
+    
+    def __init__(self, jwt_payload, noSession = False):
+        if noSession:
+            self.valid = noSession
+            self.reason = jwt_payload
         
-    def __init__(self, jwt_payload):
-        self.__init__(jwt_payload['userid'],
+        self.setFields(jwt_payload['userid'],
                 jwt_payload['name'], 
                 jwt_payload['email'],
                 jwt_payload['role_id'], 
                 jwt_payload['person_id'], 
                 jwt_payload['role_name']
-                 )
+                )
 
-    def __init__(self, reason:str):
-        self.valid = False
-        self.reason = reason
-        
+    def setFields(self, user_id, name, email, role_id, person_id, role_name):
+        self.userid = user_id
+        self.name =  name
+        self.email = email
+        self.role_id = role_id
+        self.person_id = person_id
+        self.role_name = role_name
+        self.valid = True
+
     
+        
+    def __str__(self) -> str:
+        if not self.valid:
+            return str({"valid":self.valid,"reason":self.reason})
+        else:
+            return str({
+                "email":self.email,
+                "name":self.name,
+                "valid":self.valid,
+                "role_id":self.role_id
+                })
 
 # This function verifies the JWT token and returns the decoded payload
 def get_rle_session(request: Request):
     ## Remove this to validate api
     rle_session_ck = request.cookies.get(COOKIE_KEY)
     if not rle_session_ck:
-        return RleSession("No Cookie")
+        return RleSession("No Cookie",noSession=True)
     try:
         decoded_token = jwt.decode(rle_session_ck, JWT_SCERET,algorithms="HS256")
         return RleSession(decoded_token)
     
     except (jwt.exceptions.InvalidTokenError, jwt.exceptions.InvalidSignatureError,ValueError, KeyError) as v:
         print(v.with_traceback())
-        return RleSession("Invalid Token")
+        return RleSession("Invalid Token",noSession=True)
     
  
 

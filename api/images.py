@@ -21,6 +21,10 @@ async def get_gallery(lab_id:int, user:RleSession = Depends(get_session), db:Ses
 ## New Gallery Image Creation
 @router.post("/galleryimage")
 async def add_gallery_image(gallery: schemas.GalleryImageAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
+
     for image in gallery.gallery_images_url:
         gallery_bin_id = await insert_into_binary_table(db,image)
 
@@ -40,6 +44,9 @@ async def add_gallery_image(gallery: schemas.GalleryImageAdd ,user:RleSession = 
 ## to delete images from gallery - Completed
 @router.delete("/images")
 async def delete_images_by_id(imageids:list[int],user:RleSession = Depends(get_session), db:Session = Depends(get_db)) :
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
     for imageid in imageids:
         image = db.get(models.Gallery,imageid)
         image_binary = db.get(models.Binary,image.binary_id)
@@ -52,6 +59,10 @@ async def delete_images_by_id(imageids:list[int],user:RleSession = Depends(get_s
 
 @router.post("/sliderimage")
 async def add_slider_image(sli: schemas.SliderImageAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
+    
     sli_bin_id = await insert_into_binary_table(db,sli.slider_image)
 
     ## Slider Table entry
@@ -72,6 +83,9 @@ async def add_slider_image(sli: schemas.SliderImageAdd ,user:RleSession = Depend
 @router.put("/sliderimage/{slider_id}")
 async def update_slider_image(slider_id:int,slider: schemas.SliderImageUpdate ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
+
     db_item = db.query(models.Slider).filter(models.Slider.id==slider_id).first()
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.slider_binary_id).first()
     if not db_item:
@@ -91,6 +105,10 @@ async def update_slider_image(slider_id:int,slider: schemas.SliderImageUpdate ,u
 ## to delete a slider image
 @router.delete("/slider")
 async def delete_slider_image_by_id(slider_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
+    
     slider_image = db.get(models.Slider,slider_id)
     slider_image_binary = db.get(models.Binary,slider_image.slider_binary_id)
     db.delete(slider_image)

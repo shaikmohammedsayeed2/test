@@ -13,7 +13,7 @@ from session import *
 router = APIRouter()
 
 @router.post("/auth/signin")
-async def after_sign_in(signin_data:schemas.SignInData, response:Response, db: Session = Depends(utils.get_session)):
+async def after_sign_in(signin_data:schemas.SignInData, response:Response, db: Session = Depends(utils.get_db)):
     try:
         # Specify the CLIENT_ID of the app that accesses the backend:
         idinfo = id_token.verify_oauth2_token(signin_data.g_token, requests.Request(), CLIENT_ID)
