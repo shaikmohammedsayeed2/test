@@ -20,7 +20,7 @@ async def get_all_events(lab_id: int, user: RleSession = Depends(get_session), d
 ## Event creation
 @router.post("/event")
 async def add_event(event: schemas.EventAdd, user: RleSession = Depends(get_session), db: Session = Depends(get_db)):
-    CHECK_ACCESS(user, USER_ROLE["manager"])
+    CHECK_ACCESS(user, USER_ROLE["user"])
 
     event_bin_id = await insert_into_binary_table(db, event.event_image)
 
@@ -84,7 +84,7 @@ async def add_new_event(event: schemas.NewEventAdd, user: RleSession = Depends(g
 @router.put("/event/{event_id}")
 async def update_event(event_id: int, event: schemas.EventUpdate, user: RleSession = Depends(get_session),
                        db: Session = Depends(get_db)):
-    CHECK_ACCESS(user, USER_ROLE["manager"])
+    CHECK_ACCESS(user, USER_ROLE["user"])
 
     db_item = db.query(models.Events).filter(models.Events.id == event_id).first()
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.binary_id).first()
@@ -111,6 +111,7 @@ async def delete_event_by_id(event_id: int, user: RleSession = Depends(get_sessi
     event = db.get(models.Events, event_id)
     event_cover_image = db.get(models.Binary, event.binary_id)
     db.delete(event)
+    db.commit()
     db.delete(event_cover_image)
     db.commit()
     return ""

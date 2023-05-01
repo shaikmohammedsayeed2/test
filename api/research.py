@@ -37,7 +37,7 @@ async def get_publications(lab_id: int, user: RleSession = Depends(get_session),
 @router.post("/publication")
 async def add_publication(pub: schemas.PublicationAdd, user: RleSession = Depends(get_session),
                           db: Session = Depends(get_db)):
-    CHECK_ACCESS(user, USER_ROLE["manager"])
+    CHECK_ACCESS(user, USER_ROLE["user"])
 
     ## Insert into Binary table
     publication_bin_id = await insert_into_binary_table(db, pub.pub_pdf)

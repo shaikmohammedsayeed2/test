@@ -148,5 +148,127 @@ def test_create_conference_access_levels():
     
     # Create a new conference Unauthorized
     conf_response = create_new_conference(lab_id,unauthorized_jwt_token)
+    assert conf_response.status_code == 401
+    
+    # Create a new conference by user of same lab
+    cookie = create_auth_token("user",lab_id)
+    conf_response = create_new_conference(lab_id,cookie)
     assert conf_response.status_code == 200
-                
+    
+    # Create a new conference by user of different lab
+    #cookie = create_auth_token("user",lab_id-1)
+    #conf_response = create_new_conference(lab_id,cookie)
+    #assert conf_response.status_code == 401
+    
+    # Create a new conference by manager of same lab
+    cookie = create_auth_token("manager",lab_id)
+    conf_response = create_new_conference(lab_id,cookie)
+    assert conf_response.status_code == 200
+    
+    # Create a new conference by manager of different lab
+    #cookie = create_auth_token("manager",lab_id-1)
+    #conf_response = create_new_conference(lab_id,cookie)
+    #assert conf_response.status_code == 401 
+
+def test_update_conference_access_levels():
+    lab_response = create_new_lab()
+    
+    # Check for status code
+    assert lab_response.status_code == 200
+    
+    lab_id = lab_response.json()
+    
+    conf_response = create_new_conference(lab_id,authorized_jwt_token_admin)
+    
+    # Check for status code
+    assert conf_response.status_code == 200
+    
+    conference_id = conf_response.json()
+    
+    # Get the instance by querying db
+    
+    with TestingSessionLocal() as mock_db:
+        conference = mock_db.query(models.Conference).filter(models.Conference.id == conference_id).first()
+        assert conference is not None
+        
+        # Unauthorized
+        client.cookies.set(COOKIE_KEY, unauthorized_jwt_token)
+        response = client.put(
+            "/conference/{0}".format(conference_id),
+            json = jsonable_encoder(conference)
+        )
+        assert response.status_code == 401
+        
+        # Update by user of same lab
+        cookie = create_auth_token("user",lab_id)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put(
+            "/conference/{0}".format(conference_id),
+            json = jsonable_encoder(conference)
+        )
+        assert response.status_code == 200
+        
+        # Update by user of different lab
+        #cookie = create_auth_token("user",lab_id-1)
+        #client.cookies.set(COOKIE_KEY, cookie)
+        #response = client.put(
+        #    "/conference/{0}".format(conference_id),
+        #    json = jsonable_encoder(conference)
+        #)
+        #assert response.status_code == 401
+        
+        # Update by manager of same lab
+        cookie = create_auth_token("manager",lab_id)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put(
+            "/conference/{0}".format(conference_id),
+            json = jsonable_encoder(conference)
+        )
+        assert response.status_code == 200
+        
+        # Update by manager of different lab
+        #cookie = create_auth_token("manager",lab_id-1)
+        #client.cookies.set(COOKIE_KEY, cookie)
+        #response = client.put(
+        #    "/conference/{0}".format(conference_id),
+        #    json = jsonable_encoder(conference)
+        #)
+        #assert response.status_code == 401
+
+def test_delete_conference_access_levels():
+    lab_response = create_new_lab()
+    
+    # Check for status code
+    assert lab_response.status_code == 200
+    
+    lab_id = lab_response.json()
+    
+    conf_response = create_new_conference(lab_id,authorized_jwt_token_admin)
+    
+    # Check for status code
+    assert conf_response.status_code == 200
+    
+    conference_id = conf_response.json()
+    
+    # Unauthorized
+    client.cookies.set(COOKIE_KEY, unauthorized_jwt_token)
+    response = client.delete(
+        "/conference?conf_id={0}".format(conference_id)
+    )
+    assert response.status_code == 401
+    
+    # Delete by manager of different lab
+    #cookie = create_auth_token("manager",lab_id-1)
+    #client.cookies.set(COOKIE_KEY, cookie)
+    #response = client.delete(
+    #    "/conference?conf_id={0}".format(conference_id)
+    #)
+    #assert response.status_code == 401 
+    
+    # Delete by manager of same lab
+    cookie = create_auth_token("manager",lab_id)
+    client.cookies.set(COOKIE_KEY, cookie)
+    response = client.delete(
+        "/conference?conf_id={0}".format(conference_id)
+    )
+    assert response.status_code == 200                  

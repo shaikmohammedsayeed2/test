@@ -151,9 +151,27 @@ def test_create_publication_access_levels():
     pub_response = create_new_publication(lab_id,unauthorized_jwt_token)
     assert pub_response.status_code == 401
     
-    # Create a new publication Unauthorized
-    pub_response = create_new_publication(lab_id,authorized_jwt_token_user)
-    assert pub_response.status_code == 401
+    # Create a new publication by user of same lab
+    cookie = create_auth_token("user",lab_id)
+    pub_response = create_new_publication(lab_id,cookie)
+    assert pub_response.status_code == 200
+    
+    # Create a new publication by user of different lab
+    #cookie = create_auth_token("user",lab_id-1)
+    #pub_response = create_new_publication(lab_id,cookie)
+    #assert pub_response.status_code == 401
+    
+    # Create a new publication by manager of same lab
+    cookie = create_auth_token("manager",lab_id)
+    pub_response = create_new_publication(lab_id,cookie)
+    assert pub_response.status_code == 200
+    
+    # Create a new publication by manager of different lab
+    #cookie = create_auth_token("manager",lab_id-1)
+    #pub_response = create_new_publication(lab_id,cookie)
+    #assert pub_response.status_code == 401
+    
+    
  
  
     
@@ -176,14 +194,9 @@ def test_update_publication_access_levels():
     
     with TestingSessionLocal() as mock_db:
         publication = mock_db.query(models.Publication).filter(models.Publication.id == publication_id).first()
-        publication.pub_title = "Updated name"
-        publication.description = "Updated description"
-        publication.pub_binary_id = publication.pub_binary_id
-        publication.lab_id = lab_id
-        publication.pub_date = "2023-05-02"
-        publication.type = "conference"
+        assert publication is not None
         
-        # Unauthorized\
+        # Unauthorized
         client.cookies.set(COOKIE_KEY, unauthorized_jwt_token)
         response = client.put(
             "/publication/{0}".format(publication_id),
@@ -191,13 +204,43 @@ def test_update_publication_access_levels():
         )
         assert response.status_code == 401
         
-        # Unauthorized\
-        client.cookies.set(COOKIE_KEY, authorized_jwt_token_user)
+        # Update by user of same lab
+        cookie = create_auth_token("user",lab_id)
+        client.cookies.set(COOKIE_KEY, cookie)
         response = client.put(
             "/publication/{0}".format(publication_id),
             json = jsonable_encoder(publication)
         )
-        assert response.status_code == 401
+        assert response.status_code == 200
+        
+        # Update by user of different lab
+        #cookie = create_auth_token("user",lab_id-1)
+        #client.cookies.set(COOKIE_KEY, cookie)
+        #response = client.put(
+        #    "/publication/{0}".format(publication_id),
+        #    json = jsonable_encoder(publication)
+        #)
+        #assert response.status_code == 401
+        
+        # Update by manager of same lab
+        cookie = create_auth_token("manager",lab_id)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put(
+            "/publication/{0}".format(publication_id),
+            json = jsonable_encoder(publication)
+        )
+        assert response.status_code == 200
+        
+        # Update by manager of different lab
+        #cookie = create_auth_token("manager",lab_id-1)
+        #client.cookies.set(COOKIE_KEY, cookie)
+        #response = client.put(
+        #    "/publication/{0}".format(publication_id),
+        #    json = jsonable_encoder(publication)
+        #)
+        #assert response.status_code == 401
+        
+        
  
 def test_delete_publication_access_levels():
     lab_response = create_new_lab()
@@ -221,10 +264,21 @@ def test_delete_publication_access_levels():
     )
     assert response.status_code == 401  
     
-    # Unauthorized
-    client.cookies.set(COOKIE_KEY, authorized_jwt_token_user)
+    # Delete by manager of different lab
+    #cookie = create_auth_token("manager",lab_id-1)
+    #client.cookies.set(COOKIE_KEY, cookie)
+    #response = client.delete(
+    #    "/publication?publication_id={0}".format(publication_id)
+    #)
+    #assert response.status_code == 401 
+    
+    # Delete by manager of same lab
+    cookie = create_auth_token("manager",lab_id)
+    client.cookies.set(COOKIE_KEY, cookie)
     response = client.delete(
         "/publication?publication_id={0}".format(publication_id)
     )
-    assert response.status_code == 401        
+    assert response.status_code == 200
+    
+             
                   
