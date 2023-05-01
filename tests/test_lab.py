@@ -3,37 +3,19 @@ from tests.base import *
 from fastapi.encoders import jsonable_encoder
 
 
-# Helper method for lab creation
-def create_new_lab(clt):
-    lab_data = {
-        "name": "Test_lab",
-        "overview": "Overview",
-        "address": "address",
-        "email": "email",
-        "phone": "phone",
-        "twitter_handle": "string",
-        "lab_logo_url": "string",
-        "lab_cover_url": "string"
-    }
-
-    response = clt.post(
-        "/lab",
-        json=lab_data
-    )
-
-    return response
 
 
 # Unit test for lab retrieval
 def test_get_lab():
     # Create a new lab helper function
-    response = create_new_lab(client)
-
-    lab_id = response.json()
+    response = create_new_lab()
+    
     # Check for status code 
     assert response.status_code == 200
 
-    # Check the lab with mock data
+    lab_id = response.json()
+    
+    # Check the lab get api
     response = client.get("/home/{0}".format(lab_id))
     assert response.status_code == 200
 
@@ -44,7 +26,7 @@ def test_get_lab():
 # Unit test for lab insertion
 def test_create_lab():
     # Create a new lab helper function
-    response = create_new_lab(client)
+    response = create_new_lab()
 
     lab_id = response.json()
     # Check for status code 
@@ -59,7 +41,7 @@ def test_create_lab():
 # Unit test for lab update
 def test_update_lab():
     # Create a new lab
-    response = create_new_lab(client)
+    response = create_new_lab()
 
     lab_id = response.json()
 
@@ -78,8 +60,8 @@ def test_update_lab():
         assert response.status_code == 200
 
         # Query mock db for lab updation
-        mock_db.add(lab)
-        mock_db.commit()
+        #mock_db.add(lab)
+        #mock_db.commit()
 
         n_lab = mock_db.query(models.Lab).filter(models.Lab.id == lab_id).first()
 
@@ -93,7 +75,7 @@ def test_update_lab():
 # Unit test for lab deletion
 def test_delete_lab():
     # Create a new lab
-    response = create_new_lab(client)
+    response = create_new_lab()
 
     lab_id = response.json()
 
