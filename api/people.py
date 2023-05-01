@@ -30,6 +30,9 @@ async def get_person(person_id:int, user:RleSession = Depends(get_session), db:S
 
 @router.post("/person")
 async def add_person(person: schemas.PersonAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
     # Checks 
     try:
         assert person.person_role.lower() in PERSON_ROLE.keys() 
@@ -78,6 +81,9 @@ async def add_person(person: schemas.PersonAdd ,user:RleSession = Depends(get_se
 ## to delete a person
 @router.delete("/person")
 async def delete_labmember_by_id(labmember_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
     person_id = db.get(models.LabMember,labmember_id).person_id
     ref_count = db.query(models.Person).filter(models.Person.id==person_id).count()
     if ref_count == 1:
@@ -91,6 +97,12 @@ async def delete_labmember_by_id(labmember_id:int,user:RleSession = Depends(get_
 @router.put("/person/{person_id}")
 async def update_person(person_id:int,person: schemas.PersonUpdate ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     
+    CHECK_ACCESS(user, USER_ROLE["user"])
+
+    # Allow the person to edit his data only
+    if user.role_id==USER_ROLE["user"] and person_id != user.person_id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
     db_item = db.query(models.Person).filter(models.Person.id==person_id).first()
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.profile_binary_id).first()
     db_lab_member = db.query(models.LabMember).filter(models.LabMember.person_id == person_id).first()

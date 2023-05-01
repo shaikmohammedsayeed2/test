@@ -1,7 +1,8 @@
 from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 import models, schemas
-from utils import get_db, insert_into_binary_table
+from utils import *
+from session import RleSession
 from sqlalchemy import text
 from pathlib import Path
 
@@ -10,14 +11,17 @@ router = APIRouter()
 
 ## Get All Events
 @router.get("/event/{lab_id}")
-async def get_all_events(lab_id:int, db: Session = Depends(get_db)):
+async def get_all_events(lab_id:int, user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     sql = text(Path("sql/all_events.sql").read_text().format(lab_id))
     results = db.execute(sql)
     return results.mappings().all()
 
 ## Event creation
 @router.post("/event")
-async def add_event(event: schemas.EventAdd ,db: Session = Depends(get_db)):
+async def add_event(event: schemas.EventAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
     event_bin_id = await insert_into_binary_table(db,event.event_image)
 
     ## Event Table entry
@@ -39,7 +43,10 @@ async def add_event(event: schemas.EventAdd ,db: Session = Depends(get_db)):
 
 ## New Event Creation Api Along with gallery
 @router.post("/newevent")
-async def add_new_event(event:schemas.NewEventAdd, db:Session = Depends(get_db)):
+async def add_new_event(event:schemas.NewEventAdd, user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
     event_bin_id = await insert_into_binary_table(db,event.event_image)
     
     event_entry = models.Events(
@@ -73,8 +80,10 @@ async def add_new_event(event:schemas.NewEventAdd, db:Session = Depends(get_db))
 
 ## To Update A Event
 @router.put("/event/{event_id}")
-async def update_event(event_id:int,event: schemas.EventUpdate ,db: Session=Depends(get_db)):
-    
+async def update_event(event_id:int,event: schemas.EventUpdate ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
     db_item = db.query(models.Events).filter(models.Events.id==event_id).first()
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.binary_id).first()
     if not db_item:
@@ -93,7 +102,10 @@ async def update_event(event_id:int,event: schemas.EventUpdate ,db: Session=Depe
 
 ## to delete a event - Completed
 @router.delete("/event")
-async def delete_event_by_id(event_id:int,db: Session = Depends(get_db)):
+async def delete_event_by_id(event_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+    
     event = db.get(models.Events,event_id)
     event_cover_image = db.get(models.Binary,event.binary_id)
     db.delete(event)
@@ -105,7 +117,10 @@ async def delete_event_by_id(event_id:int,db: Session = Depends(get_db)):
 
 ## New PosterDemo Creation
 @router.post("/posterdemo")
-async def add_poster_demo(posdem: schemas.PosterDemoAdd ,db: Session = Depends(get_db)):
+async def add_poster_demo(posdem: schemas.PosterDemoAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+    
     posdem_bin_id = await insert_into_binary_table(db,posdem.poster_demo_image)
 
     ## Event Table entry
@@ -126,7 +141,10 @@ async def add_poster_demo(posdem: schemas.PosterDemoAdd ,db: Session = Depends(g
 
 
 @router.delete("/posterdemo")
-async def delete_posterdemo_by_id(posdem_id:int,db: Session = Depends(get_db)):
+async def delete_posterdemo_by_id(posdem_id:int, user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
     poster = db.get(models.PosterDemo,posdem_id)
     poster_binary = db.get(models.Binary,poster.binary_id)
     db.delete(poster)
@@ -136,8 +154,10 @@ async def delete_posterdemo_by_id(posdem_id:int,db: Session = Depends(get_db)):
 
 ## To Update A Poster or Demo
 @router.put("/posterdemo/{posterdemo_id}")
-async def update_poster(posterdemo_id:int,posdem: schemas.PosterDemoUpdate ,db: Session=Depends(get_db)):
+async def update_poster(posterdemo_id:int, posdem: schemas.PosterDemoUpdate ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
     db_item = db.query(models.PosterDemo).filter(models.PosterDemo.id==posterdemo_id).first()
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.binary_id).first()
     if not db_item:

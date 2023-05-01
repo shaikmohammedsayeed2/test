@@ -19,6 +19,10 @@ async def read_users(user:RleSession = Depends(get_session), db:Session = Depend
 ## New lab creation
 @router.post("/lab")
 async def create_lab(lab: schemas.LabAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+
+    CHECK_ACCESS(user, USER_ROLE["admin"])
+
+
     ## Insert into Binary table 
     lab_logo_bin_id = await insert_into_binary_table(db,lab.lab_logo_url)
     lab_cover_bin_id = await insert_into_binary_table(db,lab.lab_cover_url)
@@ -58,6 +62,9 @@ async def create_lab(lab: schemas.LabAdd ,user:RleSession = Depends(get_session)
 ## to delete a lab - Completed
 @router.delete("/lab")
 async def delete_lab_by_id(lab_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+
+    CHECK_ACCESS(user, USER_ROLE["admin"])
+
     lab = db.get(models.Lab,lab_id)
     contactus = db.get(models.ContactUs,lab.contact_id)
     logo_image = db.get(models.Binary,lab.lab_logo_id)
@@ -76,6 +83,9 @@ async def delete_lab_by_id(lab_id:int,user:RleSession = Depends(get_session), db
 ## New ContactUs Creation
 @router.post("/contactus")
 async def add_contactus(contact: schemas.ContactUsAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+    
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
     ## ContactUs Table entry
     contactus_entry = models.ContactUs(
         address = contact.address,
@@ -96,6 +106,9 @@ async def add_contactus(contact: schemas.ContactUsAdd ,user:RleSession = Depends
 @router.put("/lab/{lab_id}")
 async def update_lab(lab_id:int,lab: schemas.LabUpdate ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
+
     db_item = db.query(models.Lab).filter(models.Lab.id==lab_id).first()
     db_contact = db.query(models.ContactUs).filter(models.ContactUs.id == db_item.contact_id).first()
     if not db_item:
