@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from api import events,home,images,lab,other,people,research
+from api import events,home,images,lab,other,people,research,auth
 import session
 import uvicorn
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -59,7 +59,7 @@ app.include_router(research.router, tags=["Research"])
 app.include_router(events.router, tags=["Events"])
 app.include_router(images.router, tags=["Images"])
 app.include_router(other.router, tags=["Other"])
-app.include_router(session.router, tags=["Auth"])
+app.include_router(auth.router, tags=["Auth"])
 
 
 # Redirection to the docs [Only for debug]

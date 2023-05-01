@@ -1,14 +1,16 @@
 from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 import models, schemas
-from utils import get_db, insert_into_binary_table
+from utils import *
+from session import RleSession
+
 from sqlalchemy import text
 from pathlib import Path
 router = APIRouter()
 
 
 @router.get("/labs", response_model=list[schemas.Lab])
-async def read_users(db: Session = Depends(get_db)):
+async def read_users(user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     labs = db.query(models.Lab).all()
     print(labs)
     return labs
@@ -16,7 +18,7 @@ async def read_users(db: Session = Depends(get_db)):
 
 ## New lab creation
 @router.post("/lab")
-async def create_lab(lab: schemas.LabAdd ,db: Session = Depends(get_db)):
+async def create_lab(lab: schemas.LabAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     ## Insert into Binary table 
     lab_logo_bin_id = await insert_into_binary_table(db,lab.lab_logo_url)
     lab_cover_bin_id = await insert_into_binary_table(db,lab.lab_cover_url)
@@ -55,7 +57,7 @@ async def create_lab(lab: schemas.LabAdd ,db: Session = Depends(get_db)):
 
 ## to delete a lab - Completed
 @router.delete("/lab")
-async def delete_lab_by_id(lab_id:int,db: Session = Depends(get_db)):
+async def delete_lab_by_id(lab_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     lab = db.get(models.Lab,lab_id)
     contactus = db.get(models.ContactUs,lab.contact_id)
     logo_image = db.get(models.Binary,lab.lab_logo_id)
@@ -73,7 +75,7 @@ async def delete_lab_by_id(lab_id:int,db: Session = Depends(get_db)):
 
 ## New ContactUs Creation
 @router.post("/contactus")
-async def add_contactus(contact: schemas.ContactUsAdd ,db: Session = Depends(get_db)):
+async def add_contactus(contact: schemas.ContactUsAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     ## ContactUs Table entry
     contactus_entry = models.ContactUs(
         address = contact.address,
@@ -92,7 +94,7 @@ async def add_contactus(contact: schemas.ContactUsAdd ,db: Session = Depends(get
 
 ## To Update A Lab
 @router.put("/lab/{lab_id}")
-async def update_lab(lab_id:int,lab: schemas.LabUpdate ,db: Session=Depends(get_db)):
+async def update_lab(lab_id:int,lab: schemas.LabUpdate ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     
     db_item = db.query(models.Lab).filter(models.Lab.id==lab_id).first()
     db_contact = db.query(models.ContactUs).filter(models.ContactUs.id == db_item.contact_id).first()

@@ -1,8 +1,13 @@
 from sqlalchemy.orm import Session
 from database import SessionLocal
 import models
-from session import _get_session
+from session import get_rle_session, RleSession, HTTPException
 from fastapi import Request
+
+
+PERSON_ROLE = {"student" : 1,"faculty" : 2,"staff" : 3,"sponsor":4}
+USER_ROLE = {"admin":1,"user":2,"manager":3}
+
 
 # Dependency
 def get_db():
@@ -13,7 +18,8 @@ def get_db():
         db.close()
 
 def get_session(request:Request):
-    return _get_session(request),get_db()
+    return get_rle_session(request),get_db()
+
 
 async def insert_into_binary_table(db:Session, url:str):
     bin_entry = models.Binary(
@@ -36,3 +42,6 @@ def get_role_name_by_id(role_id):
     elif role_id ==2:
         return "manager"
     
+def CHECK_ACCESS(user:RleSession, MIN_ACCESS_LEVEL:int):
+    if user.valid == False or user.role_id <= MIN_ACCESS_LEVEL:
+        raise HTTPException(status_code=401, detail="Unauthorized")

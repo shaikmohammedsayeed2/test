@@ -3,19 +3,20 @@ from sqlalchemy.orm import Session
 import models, schemas
 from sqlalchemy import text
 from pathlib import Path
-from utils import get_db
+from utils import *
+from session import RleSession
 
 router = APIRouter()
 
 
 @router.get("/labs", response_model=list[schemas.Lab])
-async def read_users(db: Session = Depends(get_db)):
+async def read_users(user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     labs = db.query(models.Lab).all()
     print(labs)
     return labs
 
 @router.get("/home/{lab_id}")
-async def get_home_details(lab_id:int, db: Session = Depends(get_db)):
+async def get_home_details(lab_id:int, user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     lab = db.get(models.Lab, lab_id)
     # assert type(lab)==models.Lab
     response = dict()
@@ -54,7 +55,7 @@ async def get_resarch_metrics(lab_id:int, db: Session):
 
 
 
-async def get_home_events(lab_id:int, db: Session = Depends(get_db)):
+async def get_home_events(lab_id:int, db:Session):
     sql = text(Path("sql/home_events.sql").read_text().format(lab_id))
     results = db.execute(sql)
     return results.mappings().all()

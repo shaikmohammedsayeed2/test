@@ -3,27 +3,29 @@ from sqlalchemy.orm import Session
 import models, schemas
 from sqlalchemy import text
 from pathlib import Path
-from utils import get_db, insert_into_binary_table
+from utils import *
+from session import RleSession
+
 
 router = APIRouter()
 
 
 
 @router.get("/publications/{lab_id}")
-async def get_publications(lab_id:int, db: Session = Depends(get_db)):
+async def get_publications(lab_id:int, user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     sql = text(Path("sql/publications.sql").read_text().format(lab_id))
     results = db.execute(sql)
     return results.mappings().all()
 
 @router.get("/conferences/{lab_id}")
-async def get_publications(lab_id:int, db: Session = Depends(get_db)):
+async def get_publications(lab_id:int, user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     sql = text(Path("sql/conference.sql").read_text().format(lab_id))
     results = db.execute(sql)
     return results.mappings().all()
 
 
 @router.get("/research/{lab_id}")
-async def get_publications(lab_id:int, db: Session = Depends(get_db)):
+async def get_publications(lab_id:int, user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     response = dict()
     upcoming_conference = db.execute(text(Path("sql/research_conference.sql").read_text().format(lab_id))).mappings().all()
     response['upcoming_conference'] = upcoming_conference
@@ -34,7 +36,7 @@ async def get_publications(lab_id:int, db: Session = Depends(get_db)):
 
 
 @router.post("/publication")
-async def add_publication(pub: schemas.PublicationAdd ,db: Session = Depends(get_db)):
+async def add_publication(pub: schemas.PublicationAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
      ## Insert into Binary table 
     publication_bin_id = await insert_into_binary_table(db,pub.pub_pdf)
 
@@ -59,7 +61,7 @@ async def add_publication(pub: schemas.PublicationAdd ,db: Session = Depends(get
 
 
 @router.post("/conference")
-async def add_conference(conf: schemas.ConferenceAdd ,db: Session = Depends(get_db)):
+async def add_conference(conf: schemas.ConferenceAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     ## Insert into Binary table 
     conference_bin_id = await insert_into_binary_table(db,conf.conf_pdf)
 
@@ -84,7 +86,7 @@ async def add_conference(conf: schemas.ConferenceAdd ,db: Session = Depends(get_
 
 
 @router.post("/patent")
-async def add_patent(patent: schemas.PatentAdd ,db: Session = Depends(get_db)):
+async def add_patent(patent: schemas.PatentAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     ## Patent Table entry
     patent_entry = models.Patent(
         publication_id = patent.publication_id,
@@ -102,7 +104,7 @@ async def add_patent(patent: schemas.PatentAdd ,db: Session = Depends(get_db)):
 
 ## To Update A Conference
 @router.put("/conference/{conf_id}")
-async def update_conference(conf_id:int,conf: schemas.ConferenceUpdate ,db: Session=Depends(get_db)):
+async def update_conference(conf_id:int,conf: schemas.ConferenceUpdate ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     
     db_item = db.query(models.Conference).filter(models.Conference.id==conf_id).first()
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.conf_binary_id).first()
@@ -122,7 +124,7 @@ async def update_conference(conf_id:int,conf: schemas.ConferenceUpdate ,db: Sess
 
 ## to delete a conference - Completed
 @router.delete("/conference")
-async def delete_conference_by_id(conf_id:int,db: Session = Depends(get_db)):
+async def delete_conference_by_id(conf_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     conference = db.get(models.Conference,conf_id)
     conference_file = db.get(models.Binary,conference.conf_binary_id)
     db.delete(conference)
@@ -132,7 +134,7 @@ async def delete_conference_by_id(conf_id:int,db: Session = Depends(get_db)):
 
 ## To Update A Publication
 @router.put("/publication/{pub_id}")
-async def update_publication(pub_id:int,pub: schemas.PublicationUpdate ,db: Session=Depends(get_db)):
+async def update_publication(pub_id:int,pub: schemas.PublicationUpdate ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     
     db_item = db.query(models.Publication).filter(models.Publication.id==pub_id).first()
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.pub_binary_id).first()
@@ -152,7 +154,7 @@ async def update_publication(pub_id:int,pub: schemas.PublicationUpdate ,db: Sess
 
 ## to delete a publication - Completed
 @router.delete("/publication")
-async def delete_publication_by_id(publication_id:int,db: Session = Depends(get_db)):
+async def delete_publication_by_id(publication_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     publication = db.get(models.Publication,publication_id)
     publication_file = db.get(models.Binary,publication.pub_binary_id)
     patent_on_publication = db.query(models.Patent).filter(models.Patent.publication_id == publication_id).all()
@@ -165,7 +167,7 @@ async def delete_publication_by_id(publication_id:int,db: Session = Depends(get_
 
 ## To Update a Patent
 @router.put("/patent/{patent_id}")
-async def update_patent(patent_id:int,patent: schemas.PatentUpdate ,db: Session=Depends(get_db)):
+async def update_patent(patent_id:int,patent: schemas.PatentUpdate ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     
     db_item = db.query(models.Patent).filter(models.Patent.id==patent_id).first()
     if not db_item:
@@ -181,7 +183,7 @@ async def update_patent(patent_id:int,patent: schemas.PatentUpdate ,db: Session=
 
 ## to delete a patent - Completed
 @router.delete("/patent")
-async def delete_patent_by_id(patent_id:int,db: Session = Depends(get_db)):
+async def delete_patent_by_id(patent_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     db.delete(db.get(models.Patent,patent_id))
     db.commit()
     return ""

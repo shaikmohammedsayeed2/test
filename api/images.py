@@ -3,13 +3,13 @@ from sqlalchemy.orm import Session
 import models, schemas
 from sqlalchemy import text
 from pathlib import Path
-from utils import get_db, insert_into_binary_table
-import json
+from utils import *
+from session import RleSession
 
 router = APIRouter()
 
 @router.get("/gallery/{lab_id}")
-async def get_gallery(lab_id:int, db: Session = Depends(get_db)):
+async def get_gallery(lab_id:int, user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     sql = text(Path("sql/gallery.sql").read_text().format(lab_id))
     results = db.execute(sql)
     return results.mappings().all()
@@ -20,7 +20,7 @@ async def get_gallery(lab_id:int, db: Session = Depends(get_db)):
    
 ## New Gallery Image Creation
 @router.post("/galleryimage")
-async def add_gallery_image(gallery: schemas.GalleryImageAdd ,db: Session = Depends(get_db)):
+async def add_gallery_image(gallery: schemas.GalleryImageAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     for image in gallery.gallery_images_url:
         gallery_bin_id = await insert_into_binary_table(db,image)
 
@@ -39,7 +39,7 @@ async def add_gallery_image(gallery: schemas.GalleryImageAdd ,db: Session = Depe
 
 ## to delete images from gallery - Completed
 @router.delete("/images")
-async def delete_images_by_id(imageids:list[int],db: Session = Depends(get_db)) :
+async def delete_images_by_id(imageids:list[int],user:RleSession = Depends(get_session), db:Session = Depends(get_db)) :
     for imageid in imageids:
         image = db.get(models.Gallery,imageid)
         image_binary = db.get(models.Binary,image.binary_id)
@@ -51,7 +51,7 @@ async def delete_images_by_id(imageids:list[int],db: Session = Depends(get_db)) 
 #########################################################
 
 @router.post("/sliderimage")
-async def add_slider_image(sli: schemas.SliderImageAdd ,db: Session = Depends(get_db)):
+async def add_slider_image(sli: schemas.SliderImageAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     sli_bin_id = await insert_into_binary_table(db,sli.slider_image)
 
     ## Slider Table entry
@@ -70,7 +70,7 @@ async def add_slider_image(sli: schemas.SliderImageAdd ,db: Session = Depends(ge
 
 ## To Update A Slider Image
 @router.put("/sliderimage/{slider_id}")
-async def update_slider_image(slider_id:int,slider: schemas.SliderImageUpdate ,db: Session=Depends(get_db)):
+async def update_slider_image(slider_id:int,slider: schemas.SliderImageUpdate ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     
     db_item = db.query(models.Slider).filter(models.Slider.id==slider_id).first()
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.slider_binary_id).first()
@@ -90,7 +90,7 @@ async def update_slider_image(slider_id:int,slider: schemas.SliderImageUpdate ,d
 
 ## to delete a slider image
 @router.delete("/slider")
-async def delete_slider_image_by_id(slider_id:int,db: Session = Depends(get_db)):
+async def delete_slider_image_by_id(slider_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     slider_image = db.get(models.Slider,slider_id)
     slider_image_binary = db.get(models.Binary,slider_image.slider_binary_id)
     db.delete(slider_image)

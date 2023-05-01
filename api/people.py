@@ -3,24 +3,23 @@ from sqlalchemy.orm import Session
 import models, schemas
 from sqlalchemy import text
 from pathlib import Path
-from utils import get_db, insert_into_binary_table
+from utils import *
+from session import RleSession
 
 router = APIRouter()
 
-PERSON_ROLE = {"student" : 1,"faculty" : 2,"staff" : 3,"sponsor":4}
-USER_ROLE = {"admin":1,"user":2,"manager":3}
 
 
 ## Function to get the members of the given lab
 @router.get("/people/{lab_id}")
-async def get_people(lab_id:int, db: Session = Depends(get_db)):
+async def get_people(lab_id:int, user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     sql = text(Path("sql/people.sql").read_text().format(lab_id))
     results = db.execute(sql)
     return results.mappings().all()
 
 ## Function to get the person using person_id
 @router.get("/person/{person_id}")
-async def get_person(person_id:int, db:Session = Depends(get_db)):
+async def get_person(person_id:int, user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     response = dict()
     person = db.get(models.Person,person_id)
     response['person'] = person
@@ -30,7 +29,7 @@ async def get_person(person_id:int, db:Session = Depends(get_db)):
 
 
 @router.post("/person")
-async def add_person(person: schemas.PersonAdd ,db: Session = Depends(get_db)):
+async def add_person(person: schemas.PersonAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     # Checks 
     try:
         assert person.person_role.lower() in PERSON_ROLE.keys() 
@@ -78,7 +77,7 @@ async def add_person(person: schemas.PersonAdd ,db: Session = Depends(get_db)):
 
 ## to delete a person
 @router.delete("/person")
-async def delete_labmember_by_id(labmember_id:int,db: Session = Depends(get_db)):
+async def delete_labmember_by_id(labmember_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     person_id = db.get(models.LabMember,labmember_id).person_id
     ref_count = db.query(models.Person).filter(models.Person.id==person_id).count()
     if ref_count == 1:
@@ -90,7 +89,7 @@ async def delete_labmember_by_id(labmember_id:int,db: Session = Depends(get_db))
 
 ## to update a person
 @router.put("/person/{person_id}")
-async def update_person(person_id:int,person: schemas.PersonUpdate ,db: Session=Depends(get_db)):
+async def update_person(person_id:int,person: schemas.PersonUpdate ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     
     db_item = db.query(models.Person).filter(models.Person.id==person_id).first()
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.profile_binary_id).first()

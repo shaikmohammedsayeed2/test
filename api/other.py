@@ -2,7 +2,8 @@ from fastapi import Depends, File, APIRouter,UploadFile
 from sqlalchemy.orm import Session
 import models, schemas
 from azure.storage.blob import BlobServiceClient
-from utils import get_db
+from utils import *
+from session import RleSession
 
 router = APIRouter()
 
@@ -25,7 +26,7 @@ async def create_upload_file(file: UploadFile = File(...)):
 
 
 @router.post("/feedback")
-async def submit_feedback(feedback: schemas.FeedbackAdd ,db: Session = Depends(get_db)):
+async def submit_feedback(feedback: schemas.FeedbackAdd ,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     feedback_entry = models.Feedback(
         lab_id = feedback.lab_id,
         name = feedback.name,
@@ -41,11 +42,11 @@ async def submit_feedback(feedback: schemas.FeedbackAdd ,db: Session = Depends(g
     return feedback_entry.id
 
 @router.get("/feedback/{lab_id}")
-async def get_all_feedback(lab_id:int, db: Session = Depends(get_db)):
+async def get_all_feedback(lab_id:int, user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     return db.query(models.Feedback).filter(models.Feedback.lab_id == lab_id).all()
 
 @router.delete("/feedback")
-async def delete_all_feedbacks_by_id(feedback_ids:list[int],db: Session = Depends(get_db)):
+async def delete_all_feedbacks_by_id(feedback_ids:list[int],user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     for feedid in feedback_ids:
         feedback = db.get(models.Feedback,feedid)
         db.delete(feedback)
@@ -54,7 +55,7 @@ async def delete_all_feedbacks_by_id(feedback_ids:list[int],db: Session = Depend
     return ""  
 
 @router.delete("/feedback/{lab_id}")
-async def delete_all_feedbacks_by_labid(lab_id:int,db: Session = Depends(get_db)):
+async def delete_all_feedbacks_by_labid(lab_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
     db_feedbacks = db.query(models.Feedback).filter(models.Feedback.lab_id == lab_id).all()
     for feedback in db_feedbacks:
         db.delete(feedback)
