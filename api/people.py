@@ -23,8 +23,8 @@ async def get_person(person_id: int, user: RleSession = Depends(get_session), db
     response = dict()
     person = db.get(models.Person, person_id)
     response['person'] = person
-    person_image = db.get(models.Binary, person.profile_binary_id).blob_storage
-    response['person_image'] = person_image
+    person_image = db.get(models.Binary, person.profile_binary_id)
+    response['person_image'] = person_image.blob_storage if person_image else None
     return response
 
 
