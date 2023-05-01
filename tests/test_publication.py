@@ -157,9 +157,9 @@ def test_create_publication_access_levels():
     assert pub_response.status_code == 200
     
     # Create a new publication by user of different lab
-    #cookie = create_auth_token("user",lab_id-1)
-    #pub_response = create_new_publication(lab_id,cookie)
-    #assert pub_response.status_code == 401
+    cookie = create_auth_token("user",lab_id-1)
+    pub_response = create_new_publication(lab_id,cookie)
+    assert pub_response.status_code == 401
     
     # Create a new publication by manager of same lab
     cookie = create_auth_token("manager",lab_id)
@@ -167,9 +167,9 @@ def test_create_publication_access_levels():
     assert pub_response.status_code == 200
     
     # Create a new publication by manager of different lab
-    #cookie = create_auth_token("manager",lab_id-1)
-    #pub_response = create_new_publication(lab_id,cookie)
-    #assert pub_response.status_code == 401
+    cookie = create_auth_token("manager",lab_id-1)
+    pub_response = create_new_publication(lab_id,cookie)
+    assert pub_response.status_code == 401
     
     
  
@@ -214,13 +214,13 @@ def test_update_publication_access_levels():
         assert response.status_code == 200
         
         # Update by user of different lab
-        #cookie = create_auth_token("user",lab_id-1)
-        #client.cookies.set(COOKIE_KEY, cookie)
-        #response = client.put(
-        #    "/publication/{0}".format(publication_id),
-        #    json = jsonable_encoder(publication)
-        #)
-        #assert response.status_code == 401
+        cookie = create_auth_token("user",lab_id-1)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put(
+           "/publication/{0}".format(publication_id),
+           json = jsonable_encoder(publication)
+        )
+        assert response.status_code == 401
         
         # Update by manager of same lab
         cookie = create_auth_token("manager",lab_id)
@@ -232,13 +232,13 @@ def test_update_publication_access_levels():
         assert response.status_code == 200
         
         # Update by manager of different lab
-        #cookie = create_auth_token("manager",lab_id-1)
-        #client.cookies.set(COOKIE_KEY, cookie)
-        #response = client.put(
-        #    "/publication/{0}".format(publication_id),
-        #    json = jsonable_encoder(publication)
-        #)
-        #assert response.status_code == 401
+        cookie = create_auth_token("manager",lab_id-1)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put(
+           "/publication/{0}".format(publication_id),
+           json = jsonable_encoder(publication)
+        )
+        assert response.status_code == 401
         
         
  
@@ -265,12 +265,12 @@ def test_delete_publication_access_levels():
     assert response.status_code == 401  
     
     # Delete by manager of different lab
-    #cookie = create_auth_token("manager",lab_id-1)
-    #client.cookies.set(COOKIE_KEY, cookie)
-    #response = client.delete(
-    #    "/publication?publication_id={0}".format(publication_id)
-    #)
-    #assert response.status_code == 401 
+    cookie = create_auth_token("manager",lab_id-1)
+    client.cookies.set(COOKIE_KEY, cookie)
+    response = client.delete(
+       "/publication?publication_id={0}".format(publication_id)
+    )
+    assert response.status_code == 401 
     
     # Delete by manager of same lab
     cookie = create_auth_token("manager",lab_id)

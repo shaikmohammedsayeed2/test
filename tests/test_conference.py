@@ -42,6 +42,8 @@ def test_get_conference():
     response = client.get("/conferences/{0}".format(lab_id))
     assert response.status_code == 200
 
+
+
 # Unit test for conference insertion
 def test_create_conference():
     lab_response = create_new_lab()
@@ -62,6 +64,8 @@ def test_create_conference():
     with TestingSessionLocal() as mock_db:
         conference = mock_db.query(models.Conference).filter(models.Conference.id == conference_id).first()
         assert conference and conference.id == conference_id
+
+
 
 # Unit test for conference update
 def test_update_conference():
@@ -138,12 +142,14 @@ def test_delete_conference():
         conference = mock_db.query(models.Conference).filter(models.Conference.id == conference_id).first()
         assert conference is None        
 
+
+
+
+# Unit test for conference access levels
 def test_create_conference_access_levels():
-    lab_response = create_new_lab()
-    
+    lab_response = create_new_lab() 
     # Check for status code
     assert lab_response.status_code == 200
-    
     lab_id = lab_response.json()
     
     # Create a new conference Unauthorized
@@ -156,9 +162,9 @@ def test_create_conference_access_levels():
     assert conf_response.status_code == 200
     
     # Create a new conference by user of different lab
-    #cookie = create_auth_token("user",lab_id-1)
-    #conf_response = create_new_conference(lab_id,cookie)
-    #assert conf_response.status_code == 401
+    cookie = create_auth_token("user",lab_id-1)
+    conf_response = create_new_conference(lab_id,cookie)
+    assert conf_response.status_code == 401
     
     # Create a new conference by manager of same lab
     cookie = create_auth_token("manager",lab_id)
@@ -166,10 +172,12 @@ def test_create_conference_access_levels():
     assert conf_response.status_code == 200
     
     # Create a new conference by manager of different lab
-    #cookie = create_auth_token("manager",lab_id-1)
-    #conf_response = create_new_conference(lab_id,cookie)
-    #assert conf_response.status_code == 401 
+    cookie = create_auth_token("manager",lab_id-1)
+    conf_response = create_new_conference(lab_id,cookie)
+    assert conf_response.status_code == 401 
 
+
+# Unit test for Update conference access levels
 def test_update_conference_access_levels():
     lab_response = create_new_lab()
     
@@ -209,13 +217,13 @@ def test_update_conference_access_levels():
         assert response.status_code == 200
         
         # Update by user of different lab
-        #cookie = create_auth_token("user",lab_id-1)
-        #client.cookies.set(COOKIE_KEY, cookie)
-        #response = client.put(
-        #    "/conference/{0}".format(conference_id),
-        #    json = jsonable_encoder(conference)
-        #)
-        #assert response.status_code == 401
+        cookie = create_auth_token("user",lab_id-1)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put(
+           "/conference/{0}".format(conference_id),
+           json = jsonable_encoder(conference)
+        )
+        assert response.status_code == 401
         
         # Update by manager of same lab
         cookie = create_auth_token("manager",lab_id)
@@ -227,13 +235,13 @@ def test_update_conference_access_levels():
         assert response.status_code == 200
         
         # Update by manager of different lab
-        #cookie = create_auth_token("manager",lab_id-1)
-        #client.cookies.set(COOKIE_KEY, cookie)
-        #response = client.put(
-        #    "/conference/{0}".format(conference_id),
-        #    json = jsonable_encoder(conference)
-        #)
-        #assert response.status_code == 401
+        cookie = create_auth_token("manager",lab_id-1)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put(
+           "/conference/{0}".format(conference_id),
+           json = jsonable_encoder(conference)
+        )
+        assert response.status_code == 401
 
 def test_delete_conference_access_levels():
     lab_response = create_new_lab()
@@ -258,12 +266,12 @@ def test_delete_conference_access_levels():
     assert response.status_code == 401
     
     # Delete by manager of different lab
-    #cookie = create_auth_token("manager",lab_id-1)
-    #client.cookies.set(COOKIE_KEY, cookie)
-    #response = client.delete(
-    #    "/conference?conf_id={0}".format(conference_id)
-    #)
-    #assert response.status_code == 401 
+    cookie = create_auth_token("manager",lab_id-1)
+    client.cookies.set(COOKIE_KEY, cookie)
+    response = client.delete(
+       "/conference?conf_id={0}".format(conference_id)
+    )
+    assert response.status_code == 401 
     
     # Delete by manager of same lab
     cookie = create_auth_token("manager",lab_id)

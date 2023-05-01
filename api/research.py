@@ -39,6 +39,10 @@ async def add_publication(pub: schemas.PublicationAdd, user: RleSession = Depend
                           db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["user"])
 
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != pub.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     ## Insert into Binary table
     publication_bin_id = await insert_into_binary_table(db, pub.pub_pdf)
 
@@ -63,6 +67,10 @@ async def add_publication(pub: schemas.PublicationAdd, user: RleSession = Depend
 async def add_conference(conf: schemas.ConferenceAdd, user: RleSession = Depends(get_session),
                          db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["user"])
+
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != conf.lab_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     ## Insert into Binary table 
     conference_bin_id = await insert_into_binary_table(db, conf.conf_pdf)
@@ -90,6 +98,10 @@ async def add_conference(conf: schemas.ConferenceAdd, user: RleSession = Depends
 async def add_patent(patent: schemas.PatentAdd, user: RleSession = Depends(get_session), db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["user"])
 
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != patent.lab_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
     ## Patent Table entry
     patent_entry = models.Patent(
         publication_id=patent.publication_id,
@@ -112,6 +124,11 @@ async def update_conference(conf_id: int, conf: schemas.ConferenceUpdate, user: 
     CHECK_ACCESS(user, USER_ROLE["user"])
 
     db_item = db.query(models.Conference).filter(models.Conference.id == conf_id).first()
+
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != db_item.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.conf_binary_id).first()
     if not db_item:
         return {"error": "Item not found"}
@@ -132,8 +149,12 @@ async def update_conference(conf_id: int, conf: schemas.ConferenceUpdate, user: 
 @router.delete("/conference")
 async def delete_conference_by_id(conf_id: int, user: RleSession = Depends(get_session), db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["manager"])
-
+    
     conference = db.get(models.Conference, conf_id)
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != conference.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     conference_file = db.get(models.Binary, conference.conf_binary_id)
     db.delete(conference)
     db.commit()
@@ -149,6 +170,11 @@ async def update_publication(pub_id: int, pub: schemas.PublicationUpdate, user: 
     CHECK_ACCESS(user, USER_ROLE["user"])
 
     db_item = db.query(models.Publication).filter(models.Publication.id == pub_id).first()
+    
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != db_item.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.pub_binary_id).first()
     if not db_item:
         return {"error": "Item not found"}
@@ -170,8 +196,13 @@ async def update_publication(pub_id: int, pub: schemas.PublicationUpdate, user: 
 async def delete_publication_by_id(publication_id: int, user: RleSession = Depends(get_session),
                                    db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["manager"])
-
+    
     publication = db.get(models.Publication, publication_id)
+
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != publication.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     publication_file = db.get(models.Binary, publication.pub_binary_id)
     patent_on_publication = db.query(models.Patent).filter(models.Patent.publication_id == publication_id).all()
     for pat in patent_on_publication:
@@ -192,6 +223,10 @@ async def update_patent(patent_id: int, patent: schemas.PatentUpdate, user: RleS
     db_item = db.query(models.Patent).filter(models.Patent.id == patent_id).first()
     if not db_item:
         return {"error": "Item not found"}
+    
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != db_item.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     update_patent_data = {k: v for k, v in patent.dict(exclude_unset=True).items()}
     for key, value in update_patent_data.items():
@@ -207,6 +242,12 @@ async def update_patent(patent_id: int, patent: schemas.PatentUpdate, user: RleS
 async def delete_patent_by_id(patent_id: int, user: RleSession = Depends(get_session), db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["manager"])
 
-    db.delete(db.get(models.Patent, patent_id))
+    db_item = db.get(models.Patent, patent_id)
+
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != db_item.lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    db.delete(db_item)
     db.commit()
     return ""
