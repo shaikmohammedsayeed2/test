@@ -136,6 +136,7 @@ async def delete_conference_by_id(conf_id: int, user: RleSession = Depends(get_s
     conference = db.get(models.Conference, conf_id)
     conference_file = db.get(models.Binary, conference.conf_binary_id)
     db.delete(conference)
+    db.commit()
     db.delete(conference_file)
     db.commit()
     return ""
@@ -176,6 +177,7 @@ async def delete_publication_by_id(publication_id: int, user: RleSession = Depen
     for pat in patent_on_publication:
         db.delete(pat)
     db.delete(publication)
+    db.commit()
     db.delete(publication_file)
     db.commit()
     return ""
