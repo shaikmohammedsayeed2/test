@@ -21,7 +21,7 @@ async def after_sign_in(signin_data: schemas.SignInData, response: Response, db:
         if idinfo['hd'] != GSUITE_DOMAIN_NAME:
             raise ValueError('Wrong hosted domain.')
 
-        role_id, person_id = get_person_role_by_email(idinfo['email'], signin_data.lab_id, db);
+        role_id, person_id = get_person_role_by_email(idinfo['email'], signin_data.lab_id, db)
         # ID token is valid. Get the user's Google Account ID from the decoded token.
         jwt_payload = {
             "userid": idinfo['sub'],
