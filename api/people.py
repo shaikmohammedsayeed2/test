@@ -22,6 +22,8 @@ async def get_people(lab_id: int, user: RleSession = Depends(get_session), db: S
 async def get_person(person_id: int, user: RleSession = Depends(get_session), db: Session = Depends(get_db)):
     response = dict()
     person = db.get(models.Person, person_id)
+    if not person:
+        raise HTTPException(status_code=404, detail="Person not found")
     response['person'] = person
     person_image = db.get(models.Binary, person.profile_binary_id)
     response['person_image'] = person_image.blob_storage if person_image else None

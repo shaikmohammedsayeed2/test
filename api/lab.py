@@ -69,6 +69,7 @@ async def delete_lab_by_id(lab_id: int, user: RleSession = Depends(get_session),
     sql = text(Path("sql/delete_lab.sql").read_text().format(lab_id))
 
     db.delete(lab)
+    db.commit()
     db.delete(contactus)
     db.delete(logo_image)
     db.delete(cover_image)
