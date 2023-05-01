@@ -30,15 +30,17 @@ class RleSession:
             self.setFields(jwt_payload['userid'],
                            jwt_payload['name'],
                            jwt_payload['email'],
+                           jwt_payload['lab_id'],
                            jwt_payload['role_id'],
                            jwt_payload['person_id'],
                            jwt_payload['role_name']
                            )
 
-    def setFields(self, user_id, name, email, role_id, person_id, role_name):
+    def setFields(self, user_id, name, email, lab_id,role_id, person_id, role_name):
         self.userid = user_id
         self.name = name
         self.email = email
+        self.lab_id = lab_id
         self.role_id = role_id
         self.person_id = person_id
         self.role_name = role_name
@@ -52,7 +54,8 @@ class RleSession:
                 "email": self.email,
                 "name": self.name,
                 "valid": self.valid,
-                "role_id": self.role_id
+                "role_id": self.role_id,
+                "lab_id":self.lab_id
             })
 
 

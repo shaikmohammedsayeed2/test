@@ -24,6 +24,7 @@ def create_person(lab_id, auth_cookie):
     return response
 
 
+
 # Unit test for person retrieval
 def test_get_person():
     # Create a new lab 
@@ -163,7 +164,17 @@ def test_create_person_access_levels():
     response = create_person(lab_id, unauthorized_jwt_token)
     assert response.status_code == 401
 
-    # Create a new person Unauthorized
+    # Create a new person by manager of same lab
+    cookie = create_auth_token("manager",lab_id)
+    response = create_person(lab_id, cookie)
+    assert response.status_code == 200
+
+    # Create a new person by manager of different lab
+    cookie = create_auth_token("manager",lab_id-1)
+    response = create_person(lab_id, cookie)
+    assert response.status_code == 401
+
+    # Create a new person User
     response = create_person(lab_id, authorized_jwt_token_user)
     assert response.status_code == 401
 
@@ -185,19 +196,37 @@ def test_update_person_access_levels():
     
     # Get lab_member id from db
     with TestingSessionLocal() as mock_db:
-        lab_member = mock_db.query(models.LabMember).filter(models.LabMember.person_id == person_id).first()
-        assert lab_member is not None
+        person = mock_db.query(models.Person).filter(models.Person.id == person_id).first()
+        assert person is not None
 
         # Unauthorized
         client.cookies.set(COOKIE_KEY, unauthorized_jwt_token)
-        response = client.delete("/person?labmember_id={0}".format(lab_member.id))
+        response = client.put("/person/{0}".format(person_id),json=jsonable_encoder(person))
         assert response.status_code == 401
 
-        # User
-        client.cookies.set(COOKIE_KEY, authorized_jwt_token_user)
-        response = client.delete("/person?labmember_id={0}".format(lab_member.id))
+        # Update person by: manager of same lab
+        cookie = create_auth_token("manager",lab_id)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put("/person/{0}".format(person_id),json=jsonable_encoder(person))
+        assert response.status_code == 200
 
+        # Update person by: manager of different lab
+        cookie = create_auth_token("manager",lab_id-1)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put("/person/{0}".format(person_id),json=jsonable_encoder(person))
         assert response.status_code == 401
+
+        # Update by diffrent User 
+        cookie = create_auth_token("user",lab_id,person_id-1)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put("/person/{0}".format(person_id),json=jsonable_encoder(person))
+        assert response.status_code == 401
+
+        # Update by self
+        cookie = create_auth_token("manager",lab_id, person_id)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.put("/person/{0}".format(person_id),json=jsonable_encoder(person))
+        assert response.status_code == 200
 
 
 # Unit test for Person Delete without neccesary access
@@ -224,8 +253,26 @@ def test_delete_person_access_levels():
         response = client.delete("/person?labmember_id={0}".format(lab_member.id))
         assert response.status_code == 401
 
-        # User
-        client.cookies.set(COOKIE_KEY, authorized_jwt_token_user)
+        # Delete person by: manager of same lab
+        cookie = create_auth_token("manager",lab_id)
+        client.cookies.set(COOKIE_KEY, cookie)
         response = client.delete("/person?labmember_id={0}".format(lab_member.id))
+        assert response.status_code == 200
 
+        # Update person by: manager of different lab
+        cookie = create_auth_token("manager",lab_id-1)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.delete("/person?labmember_id={0}".format(lab_member.id))
+        assert response.status_code == 401
+
+        # Update by diffrent User 
+        cookie = create_auth_token("user",lab_id,person_id-1)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.delete("/person?labmember_id={0}".format(lab_member.id))
+        assert response.status_code == 401
+
+        # Update by self
+        cookie = create_auth_token("manager",lab_id, person_id)
+        client.cookies.set(COOKIE_KEY, cookie)
+        response = client.delete("/person?labmember_id={0}".format(lab_member.id))
         assert response.status_code == 401
