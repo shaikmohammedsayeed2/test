@@ -75,6 +75,9 @@ async def delete_all_feedbacks_by_id(feedback_ids: list[int], user: RleSession =
 
     for feedid in feedback_ids:
         feedback = db.get(models.Feedback, feedid)
+        # Manager and User should be of same lab
+        if user.role_id != USER_ROLE["admin"] and user.lab_id != feedback.lab_id:
+            raise HTTPException(status_code=401, detail="Unauthorized")
         db.delete(feedback)
 
     db.commit()
@@ -86,6 +89,10 @@ async def delete_all_feedbacks_by_labid(lab_id: int, user: RleSession = Depends(
                                         db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["manager"])
 
+    # Manager and User should be of same lab
+    if user.role_id != USER_ROLE["admin"] and user.lab_id != lab_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     db_feedbacks = db.query(models.Feedback).filter(models.Feedback.lab_id == lab_id).all()
     for feedback in db_feedbacks:
         db.delete(feedback)
