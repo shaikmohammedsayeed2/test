@@ -12,19 +12,19 @@ STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=rlestora
 IMAGE_CONTAINER = "rleassests"
 
 
-#@router.post("/uploadfile/")
-#async def create_upload_file(file: UploadFile = File(...)):
-#    blob_service_client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
-#    container_client = blob_service_client.get_container_client(IMAGE_CONTAINER)
-#    blob_client = container_client.get_blob_client(file.filename)
-#    data = await file.read()
-#    blob_client.upload_blob(data,overwrite=True)
-#    return {
-#        "url":blob_client.url,
-#        "filename": file.filename
-#        }
-    
 @router.post("/uploadfile/")
+async def create_upload_file(file: UploadFile = File(...)):
+    blob_service_client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
+    container_client = blob_service_client.get_container_client(IMAGE_CONTAINER)
+    blob_client = container_client.get_blob_client(file.filename)
+    data = await file.read()
+    blob_client.upload_blob(data,overwrite=True)
+    return {
+        "url":blob_client.url,
+        "filename": file.filename
+        }
+    
+@router.post("/uploadfile/multiple")
 async def create_upload_file(files: list[UploadFile] = File(...)):
     blob_service_client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
     container_client = blob_service_client.get_container_client(IMAGE_CONTAINER)
