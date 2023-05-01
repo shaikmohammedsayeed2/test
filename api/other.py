@@ -29,19 +29,23 @@ async def create_upload_file(file: UploadFile = File(...), user:RleSession = Dep
         }
     
 @router.post("/uploadfile/multiple")
-async def create_upload_file(files: list[UploadFile] = File(...)):
+async def create_upload_file(files: list[UploadFile] = File(...),user:RleSession = Depends(get_session)):
+
+    CHECK_ACCESS(user, USER_ROLE["manager"])
+
+
     blob_service_client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
     container_client = blob_service_client.get_container_client(IMAGE_CONTAINER)
-    response = dict()
+    response = []
     for fi in files:
         blob_client = container_client.get_blob_client(fi.filename)
         data = await fi.read()
         blob_client.upload_blob(data,overwrite=True)
-        response[fi.filename] = blob_client.url
-        #return {
-        #    "url":blob_client.url,
-        #    "filename": fi.filename
-        #    }
+        response.append({
+            "url":blob_client.url,
+            "filename": fi.filename
+           })
+        
     return response        
 
 
