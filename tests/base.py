@@ -47,7 +47,7 @@ client = TestClient(app)
 
 
 # Helper method for lab creation
-def create_new_lab():
+def create_new_lab(cookie=authorized_jwt_token_admin):
     lab_data = {
         "name": "Test_lab",
         "overview": "Overview",
@@ -59,7 +59,7 @@ def create_new_lab():
         "lab_cover_url": "string"
     }
 
-    client.cookies.set(COOKIE_KEY, authorized_jwt_token_admin)
+    client.cookies.set(COOKIE_KEY, cookie)
 
     response = client.post(
         "/lab",

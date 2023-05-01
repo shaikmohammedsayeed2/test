@@ -83,7 +83,7 @@ async def delete_lab_by_id(lab_id: int, user: RleSession = Depends(get_session),
 async def add_contactus(contact: schemas.ContactUsAdd, user: RleSession = Depends(get_session),
                         db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["manager"])
-
+    
     ## ContactUs Table entry
     contactus_entry = models.ContactUs(
         address=contact.address,
@@ -105,6 +105,10 @@ async def add_contactus(contact: schemas.ContactUsAdd, user: RleSession = Depend
 async def update_lab(lab_id: int, lab: schemas.LabUpdate, user: RleSession = Depends(get_session),
                      db: Session = Depends(get_db)):
     CHECK_ACCESS(user, USER_ROLE["manager"])
+
+    if user.role_id ==USER_ROLE["manager"] and  user.lab_id != lab_id: 
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
 
     db_item = db.query(models.Lab).filter(models.Lab.id == lab_id).first()
     db_contact = db.query(models.ContactUs).filter(models.ContactUs.id == db_item.contact_id).first()
