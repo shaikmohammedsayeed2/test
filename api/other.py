@@ -43,3 +43,18 @@ async def submit_feedback(feedback: schemas.FeedbackAdd ,db: Session = Depends(g
 @router.get("/feedback/{lab_id}")
 async def get_all_feedback(lab_id:int, db: Session = Depends(get_db)):
     return db.query(models.Feedback).filter(models.Feedback.lab_id == lab_id).all()
+
+@router.delete("/feedback")
+async def delete_all_feedbacks_by_id(feedback_ids:list[int],db: Session = Depends(get_db)):
+    for feedid in feedback_ids:
+        feedback = db.get(models.Feedback,feedid)
+        db.delete(feedback)
+    
+    db.commit()
+    return ""  
+
+@router.delete("/feedback/{lab_id}")
+async def delete_all_feedbacks_by_labid(lab_id:int,db: Session = Depends(get_db)):
+    db_feedbacks = db.query(models.Feedback).filter(models.Feedback.lab_id == lab_id).all()  
+    db.delete(db_feedbacks)
+    return ""
