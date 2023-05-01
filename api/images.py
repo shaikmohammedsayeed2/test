@@ -59,7 +59,7 @@ async def delete_images_by_id(imageids: list[int], user: RleSession = Depends(ge
 @router.post("/sliderimage")
 async def add_slider_image(sli: schemas.SliderImageAdd, user: RleSession = Depends(get_session),
                            db: Session = Depends(get_db)):
-    CHECK_ACCESS(user, USER_ROLE["manager"])
+    CHECK_ACCESS(user, USER_ROLE["user"])
 
     sli_bin_id = await insert_into_binary_table(db, sli.slider_image)
 
@@ -82,7 +82,7 @@ async def add_slider_image(sli: schemas.SliderImageAdd, user: RleSession = Depen
 @router.put("/sliderimage/{slider_id}")
 async def update_slider_image(slider_id: int, slider: schemas.SliderImageUpdate,
                               user: RleSession = Depends(get_session), db: Session = Depends(get_db)):
-    CHECK_ACCESS(user, USER_ROLE["manager"])
+    CHECK_ACCESS(user, USER_ROLE["user"])
 
     db_item = db.query(models.Slider).filter(models.Slider.id == slider_id).first()
     db_blob_storage = db.query(models.Binary).filter(models.Binary.id == db_item.slider_binary_id).first()
@@ -110,6 +110,7 @@ async def delete_slider_image_by_id(slider_id: int, user: RleSession = Depends(g
     slider_image = db.get(models.Slider, slider_id)
     slider_image_binary = db.get(models.Binary, slider_image.slider_binary_id)
     db.delete(slider_image)
+    db.commit()
     db.delete(slider_image_binary)
     db.commit()
     return ""
