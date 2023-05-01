@@ -223,7 +223,7 @@ def test_update_person_access_levels():
         assert response.status_code == 401
 
         # Update by self
-        cookie = create_auth_token("manager",lab_id, person_id)
+        cookie = create_auth_token("user",lab_id, person_id)
         client.cookies.set(COOKIE_KEY, cookie)
         response = client.put("/person/{0}".format(person_id),json=jsonable_encoder(person))
         assert response.status_code == 200
@@ -272,7 +272,7 @@ def test_delete_person_access_levels():
         assert response.status_code == 401
 
         # Update by self
-        cookie = create_auth_token("manager",lab_id, person_id)
+        cookie = create_auth_token("user",lab_id, person_id)
         client.cookies.set(COOKIE_KEY, cookie)
         response = client.delete("/person?labmember_id={0}".format(lab_member.id))
-        assert response.status_code == 401
+        assert response.status_code == 200
