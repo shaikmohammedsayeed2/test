@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from database import SessionLocal
 import models
-
+from session import _get_session
+from fastapi import Request
 
 # Dependency
 def get_db():
@@ -11,6 +12,8 @@ def get_db():
     finally:
         db.close()
 
+def get_session(request:Request):
+    return _get_session(request),get_db()
 
 async def insert_into_binary_table(db:Session, url:str):
     bin_entry = models.Binary(
