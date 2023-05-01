@@ -17,14 +17,15 @@ class RleSession:
         if noSession:
             self.valid = noSession
             self.reason = jwt_payload
+        else:
         
-        self.setFields(jwt_payload['userid'],
-                jwt_payload['name'], 
-                jwt_payload['email'],
-                jwt_payload['role_id'], 
-                jwt_payload['person_id'], 
-                jwt_payload['role_name']
-                )
+            self.setFields(jwt_payload['userid'],
+                    jwt_payload['name'], 
+                    jwt_payload['email'],
+                    jwt_payload['role_id'], 
+                    jwt_payload['person_id'], 
+                    jwt_payload['role_name']
+                    )
 
     def setFields(self, user_id, name, email, role_id, person_id, role_name):
         self.userid = user_id

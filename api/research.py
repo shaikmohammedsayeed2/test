@@ -174,7 +174,7 @@ async def update_publication(pub_id:int,pub: schemas.PublicationUpdate ,user:Rle
 @router.delete("/publication")
 async def delete_publication_by_id(publication_id:int,user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
 
-    CHECK_ACCESS(user, USER_ROLE["mamager"])
+    CHECK_ACCESS(user, USER_ROLE["manager"])
 
 
     publication = db.get(models.Publication,publication_id)

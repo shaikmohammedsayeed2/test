@@ -10,9 +10,8 @@ router = APIRouter()
 
 
 @router.get("/labs", response_model=list[schemas.Lab])
-async def read_users(user:RleSession = Depends(get_session), db:Session = Depends(get_db)):
+async def get_all_labs(db:Session = Depends(get_db)):
     labs = db.query(models.Lab).all()
-    print(labs)
     return labs
 
 
