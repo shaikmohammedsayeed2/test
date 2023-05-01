@@ -51,6 +51,10 @@ def test_update_lab():
         lab = mock_db.query(models.Lab).filter(models.Lab.id == lab_id).first()
         lab.name = "Updated name"
         lab.overview = "Updated overview"
+        lab.address = "Updated address"
+        lab.email = "Updated email"
+        lab.phone = "Updated phone"
+        lab.twitter_handle = "Updated twitter handle"
 
         # Update using the Update API
         response = client.put(
@@ -60,13 +64,15 @@ def test_update_lab():
         assert response.status_code == 200
 
         # Query mock db for lab updation
-        #mock_db.add(lab)
-        #mock_db.commit()
 
         n_lab = mock_db.query(models.Lab).filter(models.Lab.id == lab_id).first()
 
         assert lab.name == n_lab.name
         assert lab.overview == n_lab.overview
+        assert lab.address == n_lab.address
+        assert lab.email == n_lab.email
+        assert lab.phone == n_lab.phone
+        assert lab.twitter_handle == n_lab.twitter_handle
     
     # Test is done
 

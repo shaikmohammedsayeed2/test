@@ -81,11 +81,12 @@ async def delete_labmember_by_id(labmember_id: int, user: RleSession = Depends(g
     CHECK_ACCESS(user, USER_ROLE["manager"])
 
     person_id = db.get(models.LabMember, labmember_id).person_id
-    ref_count = db.query(models.Person).filter(models.Person.id == person_id).count()
+    ref_count = db.query(models.LabMember).filter(models.LabMember.person_id == person_id).count()
+    # Check for references
+    db.delete(db.get(models.LabMember, labmember_id))
+    db.commit()
     if ref_count == 1:
         db.delete(db.get(models.Person, person_id))
-    else:
-        db.delete(db.get(models.LabMember, labmember_id))
     db.commit()
     return ""
 
