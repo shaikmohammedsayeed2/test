@@ -13,7 +13,7 @@ IMAGE_CONTAINER = "rleassests"
 
 @router.post("/uploadfile/")
 async def create_upload_file(file: UploadFile = File(...), user: RleSession = Depends(get_session)):
-    CHECK_ACCESS(user, USER_ROLE["user"])
+    # CHECK_ACCESS(user, USER_ROLE["user"])
 
     blob_service_client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
     container_client = blob_service_client.get_container_client(IMAGE_CONTAINER)
@@ -28,7 +28,7 @@ async def create_upload_file(file: UploadFile = File(...), user: RleSession = De
 
 @router.post("/uploadfile/multiple")
 async def create_upload_file(files: list[UploadFile] = File(...), user: RleSession = Depends(get_session)):
-    CHECK_ACCESS(user, USER_ROLE["manager"])
+    # CHECK_ACCESS(user, USER_ROLE["manager"])
 
     blob_service_client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
     container_client = blob_service_client.get_container_client(IMAGE_CONTAINER)

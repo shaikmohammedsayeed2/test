@@ -3,7 +3,7 @@ SELECT name,roll_number,LM.id,person_role_name as user_role_name,linkedin_url,gi
 FROM 
 	(((
 		(public."TBL_LAB_MEMBER" as LM INNER JOIN public."TBL_PERSON" as person ON LM.person_id = person.id) 
-	 						INNER JOIN 
+	 						LEFT JOIN 
 	 	public."TBL_BINARY" as bin ON bin.id = person.profile_binary_id
 	) INNER JOIN public."TBL_PERSON_ROLE" as prole ON prole.id = lm.person_role_id) INNER JOIN
 	public."TBL_ROLE" as urole on urole.id = lm.role_id
